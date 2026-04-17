@@ -23,7 +23,7 @@ const GamesPage = {
         <div class="game-card__body">
           <div class="game-card__title">Match Master</div>
           <div class="game-card__desc">Match MOS Word questions to their correct answers. Flip cards and find pairs!</div>
-          <div class="game-card__xp">⚡ +30 XP per win</div>
+          <div class="game-card__xp">⚡ +30 XP per win • FREE</div>
         </div>
       </div>
 
@@ -32,7 +32,7 @@ const GamesPage = {
         <div class="game-card__body">
           <div class="game-card__title">Speed Blitz</div>
           <div class="game-card__desc">Answer as many questions correctly in 60 seconds. Race against the clock!</div>
-          <div class="game-card__xp">⚡ +5 XP per correct answer</div>
+          <div class="game-card__xp">⚡ +5 XP per correct • FREE</div>
         </div>
       </div>
 
@@ -41,7 +41,70 @@ const GamesPage = {
         <div class="game-card__body">
           <div class="game-card__title">Step Sorter</div>
           <div class="game-card__desc">Put Word procedures in the correct order. Test your step-by-step knowledge!</div>
-          <div class="game-card__xp">⚡ +25 XP per win</div>
+          <div class="game-card__xp">⚡ +25 XP per win • FREE</div>
+        </div>
+      </div>
+
+      <!-- PREMIUM GAMES SECTION -->
+      <div style="grid-column:1/-1;margin:var(--space-lg) 0 var(--space-sm)">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-sm)">
+          <div>
+            <h3 class="heading-3" style="display:flex;align-items:center;gap:var(--space-sm)">
+              <span style="background:var(--gradient-warm);-webkit-background-clip:text;-webkit-text-fill-color:transparent">👑 Premium Games</span>
+            </h3>
+            <p class="text-sm text-secondary">Brain-hacking games powered by active recall, clustering & spaced repetition</p>
+          </div>
+          <div style="display:flex;align-items:center;gap:var(--space-md)">
+            ${PremiumGames.getUsesRemaining() > 0
+              ? `<span class="badge badge-success" style="font-size:0.85rem;padding:6px 14px">🎮 ${PremiumGames.getUsesRemaining()} plays remaining</span>`
+              : `<button class="btn btn-primary btn-sm" onclick="PremiumGames.showPaymentModal()">💳 Buy 5 plays — ₦250</button>`
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="game-card" onclick="PremiumGames.tryStart('Millionaire', () => PremiumGames.millionaire.start())">
+        <div class="game-card__banner" style="background:linear-gradient(135deg, #1a237e 0%, #7c5cfc 50%, #fee440 100%)">🏆</div>
+        <div class="game-card__body">
+          <div class="game-card__title">Who Wants to Be a Millionaire</div>
+          <div class="game-card__desc">13 escalating questions with 3 lifelines: 50:50, Ask the Audience, Phone a Friend. Can you reach ₦1,000,000?</div>
+          <div class="game-card__xp">⚡ Up to +100 XP • 👑 PREMIUM</div>
+        </div>
+      </div>
+
+      <div class="game-card" onclick="PremiumGames.tryStart('Survival', () => PremiumGames.survival.start())">
+        <div class="game-card__banner" style="background:linear-gradient(135deg, #b71c1c 0%, #f72585 100%)">🔫</div>
+        <div class="game-card__body">
+          <div class="game-card__title">Word Survival</div>
+          <div class="game-card__desc">5 lives. 15 rounds. Every wrong answer costs a life. Use shields wisely. Can you survive the MOS Word battlefield?</div>
+          <div class="game-card__xp">⚡ Up to +140 XP • 👑 PREMIUM</div>
+        </div>
+      </div>
+
+      <div class="game-card" onclick="PremiumGames.tryStart('Cluster', () => PremiumGames.cluster.start())">
+        <div class="game-card__banner" style="background:linear-gradient(135deg, #4caf50 0%, #00f5d4 100%)">🧠</div>
+        <div class="game-card__body">
+          <div class="game-card__title">Brain Cluster</div>
+          <div class="game-card__desc">Group 16 MOS Word concepts into 4 correct clusters. Uses the clustering memory technique for deep learning!</div>
+          <div class="game-card__xp">⚡ +40 XP per win • 👑 PREMIUM</div>
+        </div>
+      </div>
+
+      <div class="game-card" onclick="PremiumGames.tryStart('Recall', () => PremiumGames.recall.start())">
+        <div class="game-card__banner" style="background:linear-gradient(135deg, #ff6f00 0%, #fee440 100%)">⚡</div>
+        <div class="game-card__body">
+          <div class="game-card__title">Recall Rush</div>
+          <div class="game-card__desc">Spaced repetition flashcards — rate your recall to build long-term memory. The science-backed way to learn!</div>
+          <div class="game-card__xp">⚡ Up to +95 XP • 👑 PREMIUM</div>
+        </div>
+      </div>
+
+      <div class="game-card" onclick="PremiumGames.tryStart('Tower', () => PremiumGames.tower.start())">
+        <div class="game-card__banner" style="background:linear-gradient(135deg, #795548 0%, #ff6b35 100%)">🏗️</div>
+        <div class="game-card__body">
+          <div class="game-card__title">Word Tower</div>
+          <div class="game-card__desc">Build a 12-floor tower by answering correctly! 3 wrong answers = tower collapses. Watch your tower grow in real-time!</div>
+          <div class="game-card__xp">⚡ Up to +60 XP • 👑 PREMIUM</div>
         </div>
       </div>
     `;

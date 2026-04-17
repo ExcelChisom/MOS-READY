@@ -11,7 +11,7 @@ const LEARNING_MODULES = global.module.exports.LEARNING_MODULES || global.window
 
 describe('Learning Modules', () => {
   test('has at least 5 modules', () => {
-    expect(LEARNING_MODULES.length).toBeGreaterThanOrEqual(5);
+    expect(LEARNING_MODULES.length).toBeGreaterThanOrEqual(10);
   });
 
   test('each module has required fields', () => {

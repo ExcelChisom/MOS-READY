@@ -595,6 +595,52 @@
   background: rgba(0, 245, 212, 0.08);
 }
 
+/* ========== PREMIUM GAMES STYLES ========== */
+
+/* Millionaire money ladder highlight */
+@keyframes money-pulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(254, 228, 64, 0.3); }
+  50% { box-shadow: 0 0 25px rgba(254, 228, 64, 0.6); }
+}
+
+/* Survival danger pulse */
+@keyframes danger-pulse {
+  0%, 100% { border-color: var(--accent-pink); box-shadow: 0 0 10px rgba(247, 37, 133, 0.2); }
+  50% { border-color: var(--accent-pink); box-shadow: 0 0 30px rgba(247, 37, 133, 0.5); }
+}
+
+/* Tower build animation */
+@keyframes tower-build {
+  0% { transform: translateY(20px) scaleY(0); opacity: 0; }
+  60% { transform: translateY(-5px) scaleY(1.1); }
+  100% { transform: translateY(0) scaleY(1); opacity: 1; }
+}
+
+/* Premium badge on game cards */
+.game-card__xp:has(👑) {
+  color: var(--accent-yellow);
+}
+
+/* Cluster game grid items */
+.cluster-item {
+  transition: all 0.2s ease;
+}
+
+.cluster-item.selected {
+  transform: scale(0.95);
+  box-shadow: 0 0 0 3px var(--primary-500);
+}
+
+/* Recall card flip */
+@keyframes card-flip-in {
+  0% { transform: perspective(600px) rotateX(-90deg); opacity: 0; }
+  100% { transform: perspective(600px) rotateX(0); opacity: 1; }
+}
+
+.recall-card-flip {
+  animation: card-flip-in 400ms ease-out;
+}
+
 /* ========== MOCK EXAM ========== */
 .mock-exam-header {
   display: flex;
