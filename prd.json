@@ -1,0 +1,163 @@
+{
+  "project": "MOS-READY",
+  "version": "1.0.0",
+  "description": "Gamified MOS Word Exam Prep App for Gen-Z students",
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Project Scaffolding & Design System",
+      "description": "Initialize project with package.json, folder structure, CSS design system with Gen-Z aesthetics (gradients, glassmorphism, dark mode, vibrant colors), and base HTML shell.",
+      "status": "pending",
+      "subtasks": [
+        "Create package.json with dependencies",
+        "Create folder structure (src/, public/, server/)",
+        "Build CSS design system (tokens, animations, components)",
+        "Create index.html shell with navigation"
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Navigation & App Shell",
+      "description": "Build sidebar navigation, top bar with XP display, and page routing system. Sections: Dashboard, Learn, Quizzes, Games, Mock Exam, Practice Exam, My Resources, Settings.",
+      "status": "pending",
+      "subtasks": [
+        "Sidebar with icons and labels",
+        "Top bar with XP, streak, profile",
+        "Client-side page routing",
+        "Mobile responsive hamburger menu"
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Dashboard & XP System",
+      "description": "Build the main dashboard showing progress rings, XP bar, streak counter, recent activity, and quick-start cards. Implement localStorage-based XP and progress tracking.",
+      "status": "pending",
+      "subtasks": [
+        "XP progress bar with level system",
+        "Daily streak tracker",
+        "Progress rings per module",
+        "Recent activity feed",
+        "Quick-start action cards"
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Learning Modules (Step-by-Step Guidance)",
+      "description": "Create structured learning content covering all MOS Word exam domains: Document Management, Text Formatting, Tables & Lists, References, Graphics, Collaboration. Each section has procedural steps with screenshots/illustrations.",
+      "status": "pending",
+      "subtasks": [
+        "Content data structure for modules",
+        "Module list view with progress",
+        "Step-by-step lesson view",
+        "Section completion tracking",
+        "XP award on completion"
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Section Quizzes",
+      "description": "Build quiz engine for end-of-section quizzes. Multiple choice, true/false, and scenario-based questions. Instant feedback, score tracking, XP rewards.",
+      "status": "pending",
+      "subtasks": [
+        "Quiz data structure and question bank",
+        "Quiz UI with progress indicator",
+        "Answer feedback with explanations",
+        "Score summary screen",
+        "XP calculation and award"
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Gamification Games",
+      "description": "Build interactive learning games: Match Question-to-Answer (card matching), Drag-and-Drop ordering, Speed Quiz challenge. XP awarded per game won.",
+      "status": "pending",
+      "subtasks": [
+        "Match game (flip cards, find pairs)",
+        "Drag-and-drop step ordering",
+        "Speed quiz with timer",
+        "XP rewards and animations",
+        "Game history tracking"
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Mock Quiz Section",
+      "description": "20-question mock exams based on real MOS Word scenarios. Non-repeating questions per session. Answer hints on click. Session history for revision.",
+      "status": "pending",
+      "subtasks": [
+        "Large question bank (100+ questions)",
+        "Session-based non-repeat selection",
+        "Hint system (click to reveal)",
+        "Results with correct answers",
+        "Session history and revision mode"
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Custom Resources Section",
+      "description": "Allow students to upload/paste study materials. Parse content and auto-generate quizzes from it. Track custom resource quiz scores.",
+      "status": "pending",
+      "subtasks": [
+        "File upload and text paste UI",
+        "Content parser and keyword extraction",
+        "Auto quiz generation from content",
+        "Custom quiz taking and scoring",
+        "Resource library management"
+      ]
+    },
+    {
+      "id": 9,
+      "title": "MS Word Integration",
+      "description": "Detect and launch Microsoft Word within the app context. Use iframe/embed or COM automation to keep Word accessible without leaving the app.",
+      "status": "pending",
+      "subtasks": [
+        "Detect MS Word installation",
+        "Launch Word via system command",
+        "Embedded Word panel in app",
+        "Practice document templates",
+        "Word task instructions overlay"
+      ]
+    },
+    {
+      "id": 10,
+      "title": "Practice Exam (Paid Feature)",
+      "description": "50-minute timed exam with 40 non-repeating real-scenario questions. Limited to 2 attempts per payment of 250 NGN via Paystack. Payment tracking without exposing account details.",
+      "status": "pending",
+      "subtasks": [
+        "Paystack payment integration",
+        "Payment verification and attempt tracking",
+        "40-question exam engine with 50min timer",
+        "Non-repeat question selection",
+        "Detailed results and review",
+        "Attempt counter enforcement"
+      ]
+    },
+    {
+      "id": 11,
+      "title": "Backend Server",
+      "description": "Express server for payment processing, session management, and serving the app. SQLite database for user data, payment records, and exam attempts.",
+      "status": "pending",
+      "subtasks": [
+        "Express server setup",
+        "SQLite database schema",
+        "Payment API endpoints",
+        "Session/attempt tracking API",
+        "Static file serving"
+      ]
+    },
+    {
+      "id": 12,
+      "title": "Testing & Polish",
+      "description": "Write tests, fix bugs, add micro-animations, optimize performance, and ensure everything works end-to-end.",
+      "status": "pending",
+      "subtasks": [
+        "Unit tests for quiz engine",
+        "Unit tests for XP system",
+        "Integration tests for payment flow",
+        "UI polish and animations",
+        "Cross-browser testing",
+        "Final git commit"
+      ]
+    }
+  ]
+}

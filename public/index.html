@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="MOS-READY: The ultimate gamified study app to ace your Microsoft Office Specialist Word Exam. Step-by-step guidance, interactive quizzes, and real exam practice.">
+  <title>MOS-READY — Ace Your MOS Word Exam</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/src/css/design-system.css">
+  <link rel="stylesheet" href="/src/css/layout.css">
+  <link rel="stylesheet" href="/src/css/pages.css">
+
+  <!-- SVG Gradient Definition -->
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <linearGradient id="gradient-ring" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#7c5cfc"/>
+        <stop offset="100%" stop-color="#f72585"/>
+      </linearGradient>
+      <linearGradient id="gradient-ring-accent" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#00f5d4"/>
+        <stop offset="100%" stop-color="#7c5cfc"/>
+      </linearGradient>
+      <linearGradient id="gradient-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#fee440"/>
+        <stop offset="100%" stop-color="#ff6b35"/>
+      </linearGradient>
+    </defs>
+  </svg>
+</head>
+<body>
+  <div id="app">
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar__brand">
+        <div class="sidebar__logo">M</div>
+        <div class="sidebar__brand-text"><span>MOS</span>-READY</div>
+      </div>
+
+      <nav class="sidebar__nav">
+        <div class="sidebar__section-label">Main</div>
+        <button class="nav-tab active" data-page="dashboard" id="nav-dashboard">
+          <span class="nav-tab__icon">🏠</span>
+          Dashboard
+        </button>
+        <button class="nav-tab" data-page="learn" id="nav-learn">
+          <span class="nav-tab__icon">📚</span>
+          Learn
+        </button>
+        <button class="nav-tab" data-page="quizzes" id="nav-quizzes">
+          <span class="nav-tab__icon">❓</span>
+          Quizzes
+        </button>
+        <button class="nav-tab" data-page="games" id="nav-games">
+          <span class="nav-tab__icon">🎮</span>
+          Games
+        </button>
+
+        <div class="sidebar__section-label" style="margin-top:var(--space-md)">Exams</div>
+        <button class="nav-tab" data-page="mock-exam" id="nav-mock-exam">
+          <span class="nav-tab__icon">📝</span>
+          Mock Quiz
+        </button>
+        <button class="nav-tab" data-page="practice-exam" id="nav-practice-exam">
+          <span class="nav-tab__icon">🏆</span>
+          Practice Exam
+        </button>
+
+        <div class="sidebar__section-label" style="margin-top:var(--space-md)">Tools</div>
+        <button class="nav-tab" data-page="resources" id="nav-resources">
+          <span class="nav-tab__icon">📁</span>
+          My Resources
+        </button>
+        <button class="nav-tab" data-page="word-lab" id="nav-word-lab">
+          <span class="nav-tab__icon">📄</span>
+          Word Lab
+        </button>
+      </nav>
+
+      <div class="sidebar__footer">
+        <div class="sidebar__user">
+          <div class="sidebar__avatar" id="user-avatar">S</div>
+          <div class="sidebar__user-info">
+            <div class="sidebar__user-name" id="user-name">Student</div>
+            <div class="sidebar__user-level" id="user-level">Level 1 Rookie</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Sidebar overlay for mobile -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- ===== TOPBAR ===== -->
+    <header class="topbar" id="topbar">
+      <div class="topbar__left">
+        <button class="topbar__hamburger" id="hamburger-btn">☰</button>
+        <h1 class="topbar__page-title" id="page-title">Dashboard</h1>
+      </div>
+      <div class="topbar__right">
+        <div class="topbar__streak" id="streak-display">
+          <span>🔥</span>
+          <span class="topbar__streak-value" id="streak-value">0</span>
+        </div>
+        <div class="topbar__xp-display" id="xp-display">
+          <span class="topbar__xp-icon">⚡</span>
+          <span class="topbar__xp-value" id="xp-value">0 XP</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content" id="main-content">
+
+      <!-- DASHBOARD PAGE -->
+      <div class="page active" id="page-dashboard" data-title="Dashboard">
+        <div class="dashboard-welcome animate-slide-up">
+          <h2 class="dashboard-welcome__greeting">
+            Hey there! <span id="welcome-emoji">👋</span>
+          </h2>
+          <p class="dashboard-welcome__sub">Let's crush your MOS Word exam prep today.</p>
+        </div>
+
+        <div class="dashboard-stats stagger-children">
+          <div class="stat-card">
+            <div class="stat-card__icon xp-icon">⚡</div>
+            <div class="stat-card__value" id="dash-xp">0</div>
+            <div class="stat-card__label">Total XP</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card__icon streak-icon">🔥</div>
+            <div class="stat-card__value" id="dash-streak">0</div>
+            <div class="stat-card__label">Day Streak</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card__icon quiz-icon">✅</div>
+            <div class="stat-card__value" id="dash-quizzes">0</div>
+            <div class="stat-card__label">Quizzes Done</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card__icon level-icon">🎯</div>
+            <div class="stat-card__value" id="dash-level">1</div>
+            <div class="stat-card__label">Current Level</div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <div>
+            <h3 class="heading-4 mb-md">⚡ Quick Actions</h3>
+            <div class="quick-actions stagger-children">
+              <div class="quick-action-card" data-action="learn">
+                <span class="quick-action-card__icon">📚</span>
+                <span class="quick-action-card__title">Continue Learning</span>
+                <span class="quick-action-card__desc">Pick up where you left off</span>
+              </div>
+              <div class="quick-action-card" data-action="quiz">
+                <span class="quick-action-card__icon">🧠</span>
+                <span class="quick-action-card__title">Quick Quiz</span>
+                <span class="quick-action-card__desc">Test your knowledge</span>
+              </div>
+              <div class="quick-action-card" data-action="game">
+                <span class="quick-action-card__icon">🎮</span>
+                <span class="quick-action-card__title">Play a Game</span>
+                <span class="quick-action-card__desc">Learn by playing</span>
+              </div>
+              <div class="quick-action-card" data-action="mock">
+                <span class="quick-action-card__icon">📝</span>
+                <span class="quick-action-card__title">Mock Exam</span>
+                <span class="quick-action-card__desc">Practice with real scenarios</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="heading-4 mb-md">📊 XP Progress</h3>
+            <div class="glass-card" style="margin-bottom:var(--space-md)">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-sm)">
+                <span class="text-sm font-semibold" id="level-label">Level 1</span>
+                <span class="text-xs text-secondary" id="xp-to-next">0 / 100 XP</span>
+              </div>
+              <div class="progress-bar progress-bar--lg">
+                <div class="progress-bar__fill" id="xp-progress-fill" style="width:0%"></div>
+              </div>
+            </div>
+
+            <h3 class="heading-4 mb-md" style="margin-top:var(--space-lg)">🕐 Recent Activity</h3>
+            <div class="glass-card">
+              <div class="recent-activity" id="recent-activity">
+                <div class="activity-item" style="opacity:0.5">
+                  <div class="activity-item__icon" style="background:var(--bg-glass)">📭</div>
+                  <div class="activity-item__text">No activity yet. Start learning!</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LEARN PAGE -->
+      <div class="page" id="page-learn" data-title="Learn">
+        <div class="page__header">
+          <h2 class="page__title">📚 Learning Modules</h2>
+          <p class="page__subtitle">Master every MOS Word exam objective, step by step</p>
+        </div>
+        <div class="module-grid stagger-children" id="module-grid">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Lesson detail view (hidden by default) -->
+        <div id="lesson-view" style="display:none">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- QUIZZES PAGE -->
+      <div class="page" id="page-quizzes" data-title="Quizzes">
+        <div class="page__header" id="quiz-header">
+          <h2 class="page__title">❓ Section Quizzes</h2>
+          <p class="page__subtitle">Test yourself after each learning module</p>
+        </div>
+        <div id="quiz-select" class="module-grid stagger-children">
+          <!-- Quiz selection cards populated by JS -->
+        </div>
+        <div id="quiz-area" style="display:none">
+          <!-- Active quiz UI -->
+        </div>
+      </div>
+
+      <!-- GAMES PAGE -->
+      <div class="page" id="page-games" data-title="Games">
+        <div class="page__header">
+          <h2 class="page__title">🎮 Learning Games</h2>
+          <p class="page__subtitle">Earn XP while having fun — learn without even realizing it</p>
+        </div>
+        <div class="games-grid stagger-children" id="games-list">
+          <!-- Populated by JS -->
+        </div>
+        <div id="game-area" style="display:none">
+          <!-- Active game UI -->
+        </div>
+      </div>
+
+      <!-- MOCK EXAM PAGE -->
+      <div class="page" id="page-mock-exam" data-title="Mock Quiz">
+        <div class="page__header" id="mock-header">
+          <h2 class="page__title">📝 Mock Quiz</h2>
+          <p class="page__subtitle">20 real-scenario questions with hints • Non-repeating per session</p>
+        </div>
+        <div id="mock-start" class="text-center" style="padding:var(--space-3xl) 0">
+          <div style="font-size:72px;margin-bottom:var(--space-lg)">📝</div>
+          <h3 class="heading-3 mb-md">Ready for a Mock Quiz?</h3>
+          <p class="text-secondary mb-lg" style="max-width:500px;margin:0 auto var(--space-xl)">
+            20 unique MOS Word exam questions based on real scenarios. Use hints when you're stuck.
+            Questions won't repeat within this session!
+          </p>
+          <button class="btn btn-primary btn-lg" id="start-mock-btn">Start Mock Quiz</button>
+
+          <div style="margin-top:var(--space-3xl)">
+            <h3 class="heading-4 mb-md" style="text-align:left">📋 Previous Sessions</h3>
+            <div class="exam-history" id="mock-history">
+              <div class="activity-item" style="opacity:0.5">
+                <div class="activity-item__icon" style="background:var(--bg-glass)">📭</div>
+                <div class="activity-item__text">No mock exams taken yet</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="mock-quiz-area" style="display:none">
+          <!-- Active mock quiz -->
+        </div>
+      </div>
+
+      <!-- PRACTICE EXAM PAGE -->
+      <div class="page" id="page-practice-exam" data-title="Practice Exam">
+        <div id="practice-exam-landing">
+          <div class="practice-exam-hero">
+            <div class="practice-exam-hero__badge">🏆 Premium Feature</div>
+            <h2 class="practice-exam-hero__title">
+              <span class="text-gradient">Complete Practice Exam</span>
+            </h2>
+            <p class="practice-exam-hero__desc">
+              Experience the real MOS Word certification exam. 40 scenario-based questions.
+              50 minutes. Just like the real thing.
+            </p>
+
+            <div class="practice-exam-features">
+              <div class="practice-exam-feature">
+                <div class="practice-exam-feature__icon">⏱️</div>
+                <div class="practice-exam-feature__text">
+                  <h4>50-Min Timer</h4>
+                  <p>Real exam conditions</p>
+                </div>
+              </div>
+              <div class="practice-exam-feature">
+                <div class="practice-exam-feature__icon">🎯</div>
+                <div class="practice-exam-feature__text">
+                  <h4>40 Questions</h4>
+                  <p>Non-repeating scenarios</p>
+                </div>
+              </div>
+              <div class="practice-exam-feature">
+                <div class="practice-exam-feature__icon">🔄</div>
+                <div class="practice-exam-feature__text">
+                  <h4>2 Attempts</h4>
+                  <p>Per payment</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="practice-exam-hero__price">
+              ₦250 <span>per 2 attempts</span>
+            </div>
+
+            <div class="attempt-tracker" id="attempt-tracker">
+              <span class="text-sm text-secondary">Attempts:</span>
+              <div class="attempt-dot" id="attempt-1"></div>
+              <div class="attempt-dot" id="attempt-2"></div>
+              <span class="text-sm text-secondary" id="attempts-left">No attempts available</span>
+            </div>
+
+            <div style="margin-top:var(--space-xl);display:flex;gap:var(--space-md);justify-content:center">
+              <button class="btn btn-primary btn-lg" id="pay-btn">💳 Pay ₦250 & Unlock</button>
+              <button class="btn btn-secondary btn-lg" id="start-practice-btn" style="display:none">Start Exam</button>
+            </div>
+          </div>
+        </div>
+        <div id="practice-exam-area" style="display:none">
+          <!-- Active practice exam -->
+        </div>
+      </div>
+
+      <!-- RESOURCES PAGE -->
+      <div class="page" id="page-resources" data-title="My Resources">
+        <div class="page__header">
+          <h2 class="page__title">📁 My Resources</h2>
+          <p class="page__subtitle">Upload your study materials and get auto-generated quizzes</p>
+        </div>
+
+        <div class="resource-upload" id="resource-upload-zone">
+          <div class="resource-upload__icon">📤</div>
+          <div class="resource-upload__title">Drop files here or click to upload</div>
+          <div class="resource-upload__desc">Supports .txt, .pdf text, or paste your notes below</div>
+          <input type="file" id="resource-file-input" accept=".txt,.md,.pdf" style="display:none">
+        </div>
+
+        <div style="margin-top:var(--space-lg)">
+          <textarea id="resource-paste-area"
+            placeholder="Or paste your study notes here..."
+            style="width:100%;min-height:120px;resize:vertical;padding:var(--space-md);background:var(--bg-glass);border:1px solid var(--border-default);border-radius:var(--radius-md);color:var(--text-primary);font-family:var(--font-primary)"
+          ></textarea>
+          <div style="display:flex;justify-content:flex-end;margin-top:var(--space-sm)">
+            <button class="btn btn-primary" id="analyze-resource-btn">🔍 Analyze & Generate Quiz</button>
+          </div>
+        </div>
+
+        <div class="resource-list" id="resource-list">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- WORD LAB PAGE -->
+      <div class="page" id="page-word-lab" data-title="Word Lab">
+        <div class="page__header">
+          <h2 class="page__title">📄 Word Lab</h2>
+          <p class="page__subtitle">Practice with Microsoft Word right here</p>
+        </div>
+
+        <div class="word-panel">
+          <div class="word-panel__instructions">
+            <div class="glass-card mb-md">
+              <h4 class="heading-4 mb-sm">Practice Tasks</h4>
+              <p class="text-sm text-secondary mb-md">Complete these Word tasks to earn XP</p>
+              <div class="word-task-list" id="word-task-list">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+            <button class="btn btn-primary w-full" id="launch-word-btn">📄 Launch Microsoft Word</button>
+          </div>
+          <div class="word-panel__embed" id="word-embed-area">
+            <div class="word-panel__embed-icon">📄</div>
+            <div class="word-panel__embed-text">
+              <p class="font-semibold mb-sm">Microsoft Word Integration</p>
+              <p class="text-sm text-secondary">Click "Launch Microsoft Word" to open Word. Complete the practice tasks on the left panel.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- MODAL CONTAINER -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal" id="modal-content">
+      <!-- Dynamic modal content -->
+    </div>
+  </div>
+
+  <!-- CONFETTI CANVAS -->
+  <canvas id="confetti-canvas" style="position:fixed;inset:0;pointer-events:none;z-index:9999"></canvas>
+
+  <!-- JS Modules -->
+  <script src="/src/js/data/modules.js"></script>
+  <script src="/src/js/data/questions.js"></script>
+  <script src="/src/js/utils/storage.js"></script>
+  <script src="/src/js/utils/xp.js"></script>
+  <script src="/src/js/utils/toast.js"></script>
+  <script src="/src/js/utils/confetti.js"></script>
+  <script src="/src/js/core/router.js"></script>
+  <script src="/src/js/pages/dashboard.js"></script>
+  <script src="/src/js/pages/learn.js"></script>
+  <script src="/src/js/pages/quizzes.js"></script>
+  <script src="/src/js/pages/games.js"></script>
+  <script src="/src/js/pages/mock-exam.js"></script>
+  <script src="/src/js/pages/practice-exam.js"></script>
+  <script src="/src/js/pages/resources.js"></script>
+  <script src="/src/js/pages/word-lab.js"></script>
+  <script src="/src/js/app.js"></script>
+</body>
+</html>
