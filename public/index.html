@@ -340,8 +340,8 @@
         <div class="resource-upload" id="resource-upload-zone">
           <div class="resource-upload__icon">📤</div>
           <div class="resource-upload__title">Drop files here or click to upload</div>
-          <div class="resource-upload__desc">Supports .txt, .pdf text, or paste your notes below</div>
-          <input type="file" id="resource-file-input" accept=".txt,.md,.pdf" style="display:none">
+          <div class="resource-upload__desc">Supports .pdf, .txt, .docx, .rtf, .md — or paste notes below</div>
+          <input type="file" id="resource-file-input" accept=".txt,.md,.pdf,.docx,.rtf,.doc" style="display:none">
         </div>
 
         <div style="margin-top:var(--space-lg)">
@@ -397,6 +397,12 @@
 
   <!-- CONFETTI CANVAS -->
   <canvas id="confetti-canvas" style="position:fixed;inset:0;pointer-events:none;z-index:9999"></canvas>
+
+  <!-- PDF.js for client-side PDF text extraction -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  </script>
 
   <!-- JS Modules -->
   <script src="/src/js/data/modules.js"></script>

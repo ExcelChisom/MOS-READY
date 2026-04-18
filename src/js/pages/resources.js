@@ -47,16 +47,112 @@ const ResourcesPage = {
   },
 
   readFile(file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const text = e.target.result;
-      if (text && text.length > 20) {
-        this.analyzeContent(text, file.name);
-      } else {
-        Toast.error('File appears empty or too short');
+    const ext = file.name.split('.').pop().toLowerCase();
+
+    if (ext === 'pdf') {
+      this._readPDF(file);
+    } else if (ext === 'docx' || ext === 'doc') {
+      this._readDOCX(file);
+    } else {
+      // Plain text, .md, .rtf
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const text = e.target.result;
+        if (text && text.length > 20) {
+          this.analyzeContent(text, file.name);
+        } else {
+          Toast.error('File appears empty or too short');
+        }
+      };
+      reader.readAsText(file);
+    }
+  },
+
+  async _readPDF(file) {
+    if (!window.pdfjsLib) {
+      Toast.error('PDF reader is loading. Please try again in a moment.');
+      return;
+    }
+
+    Toast.info('📄 Extracting text from PDF...');
+
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      let fullText = '';
+
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        const pageText = content.items.map(item => item.str).join(' ');
+        fullText += pageText + '\n';
       }
-    };
-    reader.readAsText(file);
+
+      fullText = fullText.trim();
+      if (fullText.length > 20) {
+        Toast.success(`📄 Extracted ${pdf.numPages} page${pdf.numPages > 1 ? 's' : ''} from PDF`);
+        this.analyzeContent(fullText, file.name);
+      } else {
+        Toast.error('Could not extract readable text from this PDF. It may be image-based — try pasting the text manually.');
+      }
+    } catch (err) {
+      console.error('PDF read error:', err);
+      Toast.error('Failed to read PDF. Try a different file or paste text manually.');
+    }
+  },
+
+  async _readDOCX(file) {
+    Toast.info('📄 Extracting text from Word document...');
+
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      // DOCX is a ZIP containing XML — extract document.xml
+      const blob = new Blob([arrayBuffer]);
+      const zip = await this._unzipDOCX(blob);
+
+      if (zip && zip.length > 20) {
+        Toast.success('📄 Text extracted from Word document');
+        this.analyzeContent(zip, file.name);
+      } else {
+        Toast.error('Could not extract text from this document. Try pasting text manually.');
+      }
+    } catch (err) {
+      console.error('DOCX read error:', err);
+      // Fallback: try reading as text
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const raw = e.target.result;
+        // Strip XML/binary noise, keep readable text
+        const text = raw.replace(/<[^>]*>/g, ' ').replace(/[^\x20-\x7E\n]/g, ' ').replace(/\s+/g, ' ').trim();
+        if (text.length > 20) {
+          this.analyzeContent(text, file.name);
+        } else {
+          Toast.error('Could not read this file format. Please paste the text manually.');
+        }
+      };
+      reader.readAsText(file);
+    }
+  },
+
+  async _unzipDOCX(blob) {
+    // Minimal DOCX parser — extracts text from document.xml inside the ZIP
+    const buffer = await blob.arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+
+    // Find 'word/document.xml' in the ZIP by scanning for the filename
+    const decoder = new TextDecoder('utf-8');
+    const fullStr = decoder.decode(bytes);
+
+    // Look for XML content between <w:t> tags (Word paragraph text)
+    const matches = fullStr.match(/<w:t[^>]*>([^<]*)<\/w:t>/g);
+    if (matches && matches.length > 0) {
+      const text = matches.map(m => m.replace(/<[^>]*>/g, '')).join(' ');
+      return text.trim();
+    }
+
+    // Fallback: strip all XML tags
+    const stripped = fullStr.replace(/<[^>]*>/g, ' ').replace(/[^\x20-\x7E\n]/g, ' ').replace(/\s+/g, ' ').trim();
+    return stripped.length > 50 ? stripped : '';
   },
 
   analyzeContent(text, title) {
