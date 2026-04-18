@@ -834,3 +834,31 @@ input:focus, textarea:focus, select:focus {
   .heading-1 { font-size: var(--text-3xl); }
   .heading-2 { font-size: var(--text-2xl); }
 }
+
+/* ---------- Word Lab Editor Toolbar ---------- */
+.editor-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 28px;
+  padding: 0 6px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.editor-btn:hover {
+  background: var(--bg-glass-active);
+  border-color: var(--primary-500);
+  color: var(--primary-300);
+}
+
+.editor-btn:active {
+  transform: scale(0.95);
+}

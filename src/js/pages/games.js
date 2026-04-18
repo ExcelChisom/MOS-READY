@@ -52,11 +52,11 @@ const GamesPage = {
             <h3 class="heading-3" style="display:flex;align-items:center;gap:var(--space-sm)">
               <span style="background:var(--gradient-warm);-webkit-background-clip:text;-webkit-text-fill-color:transparent">👑 Premium Games</span>
             </h3>
-            <p class="text-sm text-secondary">Brain-hacking games powered by active recall, clustering & spaced repetition</p>
+            <p class="text-sm text-secondary">2 free trials per game • Brain-hacking games powered by active recall, clustering & spaced repetition</p>
           </div>
           <div style="display:flex;align-items:center;gap:var(--space-md)">
-            ${PremiumGames.getUsesRemaining() > 0
-              ? `<span class="badge badge-success" style="font-size:0.85rem;padding:6px 14px">🎮 ${PremiumGames.getUsesRemaining()} plays remaining</span>`
+            ${PremiumGames.getPurchasedUses() > 0
+              ? `<span class="badge badge-success" style="font-size:0.85rem;padding:6px 14px">🎮 ${PremiumGames.getPurchasedUses()} purchased plays</span>`
               : `<button class="btn btn-primary btn-sm" onclick="PremiumGames.showPaymentModal()">💳 Buy 5 plays — ₦250</button>`
             }
           </div>
@@ -105,6 +105,15 @@ const GamesPage = {
           <div class="game-card__title">Word Tower</div>
           <div class="game-card__desc">Build a 12-floor tower by answering correctly! 3 wrong answers = tower collapses. Watch your tower grow in real-time!</div>
           <div class="game-card__xp">⚡ Up to +60 XP • 👑 PREMIUM</div>
+        </div>
+      </div>
+
+      <div class="game-card" onclick="PremiumGames.tryStart('Runner', () => PremiumGames.runner.start())">
+        <div class="game-card__banner" style="background:linear-gradient(135deg, #00b4d8 0%, #7c5cfc 50%, #f72585 100%)">🏃</div>
+        <div class="game-card__body">
+          <div class="game-card__title">MOS Word Runner</div>
+          <div class="game-card__desc">Subway Surfer-style! Run through lanes, dodge wrong answers, grab the correct ones. Questions drop from above — how far can you go?</div>
+          <div class="game-card__xp">⚡ Up to +120 XP • 👑 PREMIUM</div>
         </div>
       </div>
     `;
