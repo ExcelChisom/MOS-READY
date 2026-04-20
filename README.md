@@ -12,7 +12,7 @@ MOS-READY is a Gen-Z-focused, gamified study app that prepares students for the 
 4. **Section Quizzes** — Quiz after each learning section with instant feedback
 5. **Custom Resources** — Upload your own study materials, get AI analysis, and auto-generate quizzes
 6. **Mock Quiz Section** — 20-question real-life scenario mock exams with answer hints, non-repeating per session, with revision history
-7. **Practice Exam (Paid)** — 50-minute, 40-question timed exams (2 attempts per payment, ₦250 via Paystack)
+7. **Practice Exam (Paid)** — 50-minute, 40-question timed exams (2 attempts per payment)
 8. **Progress Dashboard** — Track XP, completed modules, quiz scores, and streaks
 
 ## Tech Stack
