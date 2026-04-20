@@ -20,7 +20,6 @@ MOS-READY is a Gen-Z-focused, gamified study app that prepares students for the 
 - **Frontend**: HTML5, CSS3 (vanilla), JavaScript (ES6+)
 - **Backend**: Node.js + Express
 - **Database**: SQLite (via better-sqlite3)
-- **Payment**: Paystack API (Nigerian bank card processing)
 - **MS Word Integration**: COM automation via PowerShell/child_process
 - **Build**: Vite for dev server
 
