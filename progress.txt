@@ -18,7 +18,6 @@
 [x] 13. Premium Games — Word Tower (progressive builder)
 [x] 14. Premium Games — MOS Word Runner (Subway Surfer-style canvas game)
 [x] 15. Per-game 2 free trials system (independent tracking per game)
-[x] 16. Paystack payment integration (₦250 for 5 plays)
 [x] 17. Security hardening (CSP, rate limiting, HMAC, sanitization)
 [x] 18. My Resources — upload/paste text, auto-generate quizzes
 [x] 19. Word Lab — Launch MS Word OR Use Built-in Rich Text Editor
