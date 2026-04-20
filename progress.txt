@@ -18,11 +18,11 @@
 [x] 13. Premium Games — Word Tower (progressive builder)
 [x] 14. Premium Games — MOS Word Runner (Subway Surfer-style canvas game)
 [x] 15. Per-game 2 free trials system (independent tracking per game)
-[x] 17. Security hardening (CSP, rate limiting, HMAC, sanitization)
-[x] 18. My Resources — upload/paste text, auto-generate quizzes
-[x] 19. Word Lab — Launch MS Word OR Use Built-in Rich Text Editor
-[x] 20. Built-in editor with toolbar (bold, italic, H1-H3, alignment, lists, tables, fonts)
-[x] 21. Test suite — 35/35 passing (Jest)
-[x] 22. Git version control with commits
+[x] 16. Security hardening (CSP, rate limiting, HMAC, sanitization)
+[x] 17. My Resources — upload/paste text, auto-generate quizzes
+[x] 18. Word Lab — Launch MS Word OR Use Built-in Rich Text Editor
+[x] 19. Built-in editor with toolbar (bold, italic, H1-H3, alignment, lists, tables, fonts)
+[x] 20. Test suite — 35/35 passing (Jest)
+[x] 21. Git version control with commits
 
 ## ALL TASKS COMPLETE ✅
