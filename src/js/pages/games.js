@@ -45,6 +45,15 @@ const GamesPage = {
         </div>
       </div>
 
+      <div class="game-card" onclick="GamesPage.startTalkingBot()">
+        <div class="game-card__banner" style="background:linear-gradient(135deg, #ffd166, #ff9f1c)">🐱🎙️</div>
+        <div class="game-card__body">
+          <div class="game-card__title">Talking Study Cat</div>
+          <div class="game-card__desc">Say a shortcut or step out loud, and the AI cat repeats it back to drill your memory!</div>
+          <div class="game-card__xp">⚡ +2 XP per word • FREE</div>
+        </div>
+      </div>
+
       <!-- PREMIUM GAMES SECTION -->
       <div style="grid-column:1/-1;margin:var(--space-lg) 0 var(--space-sm)">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-sm)">
@@ -114,6 +123,15 @@ const GamesPage = {
           <div class="game-card__title">MOS Word Runner</div>
           <div class="game-card__desc">Subway Surfer-style! Run through lanes, dodge wrong answers, grab the correct ones. Questions drop from above — how far can you go?</div>
           <div class="game-card__xp">⚡ Up to +120 XP • 👑 PREMIUM</div>
+        </div>
+      </div>
+      
+      <div class="game-card" onclick="PremiumGames.tryStart('Sniper', () => PremiumGames.sniper.start())">
+        <div class="game-card__banner" style="background:linear-gradient(135deg, #1d3557 0%, #e63946 100%)">🎯</div>
+        <div class="game-card__body">
+          <div class="game-card__title">Answer Sniper (FreeFire Style)</div>
+          <div class="game-card__desc">A high-stakes shooting gallery! Targets float across the screen with possible answers. Snipe the bot carrying the correct MOS answer!</div>
+          <div class="game-card__xp">⚡ Up to +140 XP • 👑 PREMIUM</div>
         </div>
       </div>
     `;
@@ -421,6 +439,158 @@ const GamesPage = {
         </div>
       </div>
     `;
+  },
+
+  // ===== TALKING BOT (ANGELA CLONE) =====
+  startTalkingBot() {
+    document.getElementById('games-list').style.display = 'none';
+    const header = document.querySelector('#page-games .page__header');
+    if(header) header.style.display = 'none';
+    
+    const area = document.getElementById('game-area');
+    area.style.display = 'block';
+    area.innerHTML = `
+      <div class="quiz-container animate-fade-in" style="max-width:600px;text-align:center">
+        <div class="lesson-breadcrumb" onclick="GamesPage.renderGamesList()" style="cursor:pointer;display:inline-block;margin-bottom:var(--space-md)">← Back to Games</div>
+        <h3 class="heading-2 mb-md">Talking Study Cat 🐱</h3>
+        <p class="text-secondary mb-md">Click the mic, read any Word shortcut, and this cat will repeat it to you in a funny voice to lock it into your memory!</p>
+        
+        <div id="cat-visual" style="font-size:120px; transition: transform 0.1s; height: 160px; display:flex; align-items:center; justify-content:center;">
+          🐱
+        </div>
+        
+        <div style="margin:20px 0; min-height: 40px; color: var(--accent-cyan); font-family: monospace; font-size: 1.2rem; background:rgba(0,0,0,0.3); padding:10px; border-radius:8px" id="cat-transcript">
+          ... waiting for you ...
+        </div>
+
+        <button id="cat-mic-btn" class="btn btn-primary btn-lg" onclick="GamesPage._catListen()">🎤 Start Listening</button>
+      </div>
+    `;
+  },
+
+  async _catListen() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+       Toast.error('Your browser does not support Voice Recognition. Try Chrome or Edge.');
+       return;
+    }
+
+    const btn = document.getElementById('cat-mic-btn');
+    const visual = document.getElementById('cat-visual');
+    const transcript = document.getElementById('cat-transcript');
+
+    if (this._catRec) {
+       this._catRec.stop();
+       this._catRec = null;
+       btn.textContent = '🎤 Start Listening';
+       visual.textContent = '🐱';
+       return;
+    }
+
+    // Explicitly request microphone access first (fixes iOS/Android silent failures)
+    try {
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+         await navigator.mediaDevices.getUserMedia({ audio: true });
+      }
+    } catch (err) {
+      console.error("Mic access error:", err);
+      Toast.error('Microphone access denied! Please allow access.');
+      return;
+    }
+
+    const rec = new SpeechRecognition();
+    this._catRec = rec;
+    rec.lang = 'en-US';
+    rec.interimResults = false;
+
+    // AUDIO UNLOCK - Required for speech response later
+    window.speechSynthesis.speak(new SpeechSynthesisUtterance("")); 
+
+
+    rec.onstart = () => {
+       btn.textContent = '🛑 Stop Listening';
+       btn.style.background = '#e63946';
+       visual.textContent = '🙀';
+       visual.style.transform = 'scale(1.1)';
+       transcript.textContent = '... tracking your voice ...';
+    };
+
+    rec.onresult = (event) => {
+       const text = event.results[0][0].transcript;
+       transcript.textContent = `You said: "${text}"`;
+       
+       rec.stop();
+       this._catRec = null;
+       btn.textContent = '🎤 Start Listening';
+       btn.style.background = '';
+       
+       this._catSpeak(text);
+       XP.award(10, 'Talking Study Cat Focus Drill');
+    };
+
+    rec.onerror = (event) => {
+       transcript.textContent = `Error: ${event.error}`;
+       this._catRec = null;
+       btn.textContent = '🎤 Start Listening';
+       btn.style.background = '';
+       visual.textContent = '😿';
+    };
+
+    rec.onend = () => {
+       this._catRec = null;
+       btn.textContent = '🎤 Start Listening';
+       btn.style.background = '';
+    };
+
+    rec.start();
+  },
+
+  _catSpeak(text) {
+     try {
+       const synth = window.speechSynthesis;
+       const utterance = new SpeechSynthesisUtterance(text);
+       
+       const voices = synth.getVoices();
+       const femaleVoice = voices.find(v => v.name.includes('Female') || v.name.includes('Zira') || v.name.includes('Samantha') || v.name.includes('Google'));
+       if (femaleVoice) utterance.voice = femaleVoice;
+
+       utterance.pitch = 1.9; // High pitch like Angela
+       utterance.rate = 1.1;
+       
+       const visual = document.getElementById('cat-visual');
+       
+       // Lip sync simulation
+       let syncInterval;
+       utterance.onstart = () => {
+         let mouthOpen = false;
+         syncInterval = setInterval(() => {
+            mouthOpen = !mouthOpen;
+            if(visual) {
+              visual.textContent = mouthOpen ? '😸' : '😺';
+              visual.style.transform = mouthOpen ? 'scale(1.2)' : 'scale(1.0)';
+            }
+         }, 150);
+       };
+
+       utterance.onend = () => {
+         clearInterval(syncInterval);
+         if(visual) {
+           visual.textContent = '🐱';
+           visual.style.transform = 'scale(1.0)';
+         }
+       };
+
+       utterance.onerror = (e) => {
+         console.error('Speech synthesis error:', e);
+         clearInterval(syncInterval);
+         if(visual) visual.textContent = '😿';
+       };
+
+       synth.speak(utterance);
+     } catch (err) {
+       console.error("Cat Speak failed:", err);
+       Toast.error("Failed to generate voice.");
+     }
   }
 };
 

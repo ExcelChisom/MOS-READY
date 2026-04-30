@@ -80,7 +80,9 @@ const Router = {
       'mock-exam': 'Mock Quiz',
       'practice-exam': 'Practice Exam',
       'resources': 'My Resources',
-      'word-lab': 'Word Lab'
+      'word-lab': 'Word Lab',
+      'admin-keygen': 'Admin Keygen',
+      'mnemonics': 'Mnemonics & Rap'
     };
     if (pageTitle) pageTitle.textContent = pageTitles[page] || page;
 

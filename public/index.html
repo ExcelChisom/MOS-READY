@@ -1,10 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="MOS-READY: The ultimate gamified study app to ace your Microsoft Office Specialist Word Exam. Step-by-step guidance, interactive quizzes, and real exam practice.">
+  <meta name="description"
+    content="MOS-READY: The ultimate gamified study app to ace your Microsoft Office Specialist Word Exam. Step-by-step guidance, interactive quizzes, and real exam practice.">
   <title>MOS-READY — Ace Your MOS Word Exam</title>
+
+  <!-- i18n Google Translate -->
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({ pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE }, 'google_translate_element');
+    }
+  </script>
+  <script type="text/javascript"
+    src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
   <!-- CSS -->
   <link rel="stylesheet" href="/src/css/design-system.css">
@@ -15,20 +26,21 @@
   <svg width="0" height="0" style="position:absolute">
     <defs>
       <linearGradient id="gradient-ring" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#7c5cfc"/>
-        <stop offset="100%" stop-color="#f72585"/>
+        <stop offset="0%" stop-color="#7c5cfc" />
+        <stop offset="100%" stop-color="#f72585" />
       </linearGradient>
       <linearGradient id="gradient-ring-accent" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#00f5d4"/>
-        <stop offset="100%" stop-color="#7c5cfc"/>
+        <stop offset="0%" stop-color="#00f5d4" />
+        <stop offset="100%" stop-color="#7c5cfc" />
       </linearGradient>
       <linearGradient id="gradient-gold" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#fee440"/>
-        <stop offset="100%" stop-color="#ff6b35"/>
+        <stop offset="0%" stop-color="#fee440" />
+        <stop offset="100%" stop-color="#ff6b35" />
       </linearGradient>
     </defs>
   </svg>
 </head>
+
 <body>
   <div id="app">
     <!-- ===== SIDEBAR ===== -->
@@ -47,6 +59,10 @@
         <button class="nav-tab" data-page="learn" id="nav-learn">
           <span class="nav-tab__icon">📚</span>
           Learn
+        </button>
+        <button class="nav-tab" data-page="mnemonics" id="nav-mnemonics">
+          <span class="nav-tab__icon">🎧</span>
+          Rap & Mnemonics
         </button>
         <button class="nav-tab" data-page="quizzes" id="nav-quizzes">
           <span class="nav-tab__icon">❓</span>
@@ -99,6 +115,15 @@
         <h1 class="topbar__page-title" id="page-title">Dashboard</h1>
       </div>
       <div class="topbar__right">
+        <audio id="focus-audio" loop preload="none">
+          <!-- Royalty Free Ambient Lofi Stream -->
+          <source src="https://stream.zeno.fm/f3wvbbqmdg8uv" type="audio/mpeg">
+        </audio>
+        <button id="focus-music-btn"
+          style="background:var(--bg-glass);border:1px solid var(--border-default);border-radius:20px;padding:4px 12px;color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;gap:6px;margin-right:var(--space-md);font-size:12px;transition:all 0.3s">
+          🎵 Focus Off
+        </button>
+        <div id="google_translate_element" style="margin-right:var(--space-md);"></div>
         <div class="topbar__streak" id="streak-display">
           <span>🔥</span>
           <span class="topbar__streak-value" id="streak-value">0</span>
@@ -345,10 +370,8 @@
         </div>
 
         <div style="margin-top:var(--space-lg)">
-          <textarea id="resource-paste-area"
-            placeholder="Or paste your study notes here..."
-            style="width:100%;min-height:120px;resize:vertical;padding:var(--space-md);background:var(--bg-glass);border:1px solid var(--border-default);border-radius:var(--radius-md);color:var(--text-primary);font-family:var(--font-primary)"
-          ></textarea>
+          <textarea id="resource-paste-area" placeholder="Or paste your study notes here..."
+            style="width:100%;min-height:120px;resize:vertical;padding:var(--space-md);background:var(--bg-glass);border:1px solid var(--border-default);border-radius:var(--radius-md);color:var(--text-primary);font-family:var(--font-primary)"></textarea>
           <div style="display:flex;justify-content:flex-end;margin-top:var(--space-sm)">
             <button class="btn btn-primary" id="analyze-resource-btn">🔍 Analyze & Generate Quiz</button>
           </div>
@@ -382,7 +405,407 @@
         </div>
       </div>
 
+      <!-- MNEMONICS & RAP PAGE -->
+      <div class="page" id="page-mnemonics" data-title="Rap & Mnemonics">
+        <div class="page__header"
+          style="background: linear-gradient(135deg, #1d3557, #7c5cfc); padding: var(--space-xl); border-radius: var(--radius-lg); color: white; display:flex; align-items:center; gap: var(--space-lg)">
+          <div style="font-size: 64px">🎤</div>
+          <div>
+            <h2 class="heading-1" style="color:white; margin:0">MOS Beat Studio</h2>
+            <p style="opacity:0.8; font-size:16px">Lock these shortcuts into your brain using our premium Hip-Hop
+              Mnemonics.</p>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:center; margin-top:20px">
+          <button class="btn btn-primary btn-lg" onclick="if(window.AutoRap) window.AutoRap.playAll()"
+            style="background:linear-gradient(90deg, #f72585, #7c5cfc); border:none; font-size:18px; padding:12px 30px; box-shadow:0 6px 20px rgba(124,92,252,0.4)">
+            🎙️ AUTO-RAP ALL TRACKS
+          </button>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-top: var(--space-lg)">
+          <!-- Track 1 -->
+          <div class="glass-card" style="box-shadow: 0 10px 30px rgba(0,0,0,0.2)">
+            <div
+              style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-subtle); padding-bottom:10px; margin-bottom:15px">
+              <h3 class="heading-4">Track 1: "The Clipboard Thief"</h3>
+              <button class="btn btn-primary btn-icon" onclick="if(window.AutoRap) window.AutoRap.spit('track1-lyrics')"
+                style="background:#f72585; border-radius:50%; width:40px; height:40px; display:flex; justify-content:center; align-items:center;"
+                title="Auto-Rap this track">
+                🎙️
+              </button>
+            </div>
+            <p id="track1-lyrics"
+              style="font-family: monospace; font-size: 15px; line-height: 1.8; color: var(--text-secondary); background: #0b1120; padding: 20px; border-radius: var(--radius-md)">
+              Select the text, no need for grief,<br>
+              Ctrl plus C is the copy thief.<br>
+              Move it down, break the hex,<br>
+              Ctrl plus X to cut the text.<br>
+              Now drop the beat, drop the bass,<br>
+              Ctrl plus V to paste the space!
+            </p>
+          </div>
+
+          <!-- Track 2 -->
+          <div class="glass-card" style="box-shadow: 0 10px 30px rgba(0,0,0,0.2)">
+            <div
+              style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-subtle); padding-bottom:10px; margin-bottom:15px">
+              <h3 class="heading-4">Track 2: "Document Flow"</h3>
+              <button class="btn btn-primary btn-icon" onclick="if(window.AutoRap) window.AutoRap.spit('track2-lyrics')"
+                style="background:#00f5d4; color: black; border-radius:50%; width:40px; height:40px; display:flex; justify-content:center; align-items:center;">
+                🎙️
+              </button>
+            </div>
+            <p id="track2-lyrics"
+              style="font-family: monospace; font-size: 15px; line-height: 1.8; color: var(--text-secondary); background: #0b1120; padding: 20px; border-radius: var(--radius-md)">
+              Want a new page? Listen close my friend,<br>
+              Ctrl plus N begins the trend.<br>
+              Saving your work? Don't leave a mess,<br>
+              Lock it down with Ctrl plus S.<br>
+              Need it on paper? Ain't no mystery,<br>
+              Ctrl plus P prints your history!
+            </p>
+          </div>
+
+          <!-- Track 3 -->
+          <div class="glass-card" style="box-shadow: 0 10px 30px rgba(0,0,0,0.2)">
+            <div
+              style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-subtle); padding-bottom:10px; margin-bottom:15px">
+              <h3 class="heading-4">Track 3: "The Formatting Kings"</h3>
+              <button class="btn btn-primary btn-icon" onclick="if(window.AutoRap) window.AutoRap.spit('track3-lyrics')"
+                style="background:#ffd166; color: black; border-radius:50%; width:40px; height:40px; display:flex; justify-content:center; align-items:center;">
+                🎙️
+              </button>
+            </div>
+            <p id="track3-lyrics"
+              style="font-family: monospace; font-size: 15px; line-height: 1.8; color: var(--text-secondary); background: #0b1120; padding: 20px; border-radius: var(--radius-md)">
+              Make it thick, make it cold,<br>
+              Ctrl plus B turns it bold.<br>
+              Lean it right, make it slick,<br>
+              Ctrl plus I for italic.<br>
+              Line below, make it shine,<br>
+              Ctrl plus U to underline!<br>
+              Align it left with Ctrl plus L,<br>
+              Ctrl plus E centers it well!
+            </p>
+          </div>
+
+          <!-- Track 4 -->
+          <div class="glass-card" style="box-shadow: 0 10px 30px rgba(0,0,0,0.2)">
+            <div
+              style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-subtle); padding-bottom:10px; margin-bottom:15px">
+              <h3 class="heading-4">Track 4: "The Insert Hustle"</h3>
+              <button class="btn btn-primary btn-icon" onclick="if(window.AutoRap) window.AutoRap.spit('track4-lyrics')"
+                style="background:#06d6a0; color: black; border-radius:50%; width:40px; height:40px; display:flex; justify-content:center; align-items:center;">
+                🎙️
+              </button>
+            </div>
+            <p id="track4-lyrics"
+              style="font-family: monospace; font-size: 15px; line-height: 1.8; color: var(--text-secondary); background: #0b1120; padding: 20px; border-radius: var(--radius-md)">
+              Need a link? What's the way?<br>
+              Lock it in with Ctrl plus K.<br>
+              Searching words, you're the chief,<br>
+              Find it fast with Ctrl plus F.<br>
+              Mistakes are made, don't scream or shout,<br>
+              Ctrl plus Z backs you out.<br>
+              If you meant it, don't be shy,<br>
+              Bring it back with Ctrl plus Y!
+            </p>
+          </div>
+
+          <!-- Track 5 -->
+          <div class="glass-card" style="box-shadow: 0 10px 30px rgba(0,0,0,0.2)">
+            <div
+              style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-subtle); padding-bottom:10px; margin-bottom:15px">
+              <h3 class="heading-4">Track 5: "The Table Turner"</h3>
+              <button class="btn btn-primary btn-icon" onclick="if(window.AutoRap) window.AutoRap.spit('track5-lyrics')"
+                style="background:#f15bb5; color: white; border-radius:50%; width:40px; height:40px; display:flex; justify-content:center; align-items:center;">
+                🎙️
+              </button>
+            </div>
+            <p id="track5-lyrics"
+              style="font-family: monospace; font-size: 15px; line-height: 1.8; color: var(--text-secondary); background: #0b1120; padding: 20px; border-radius: var(--radius-md)">
+              Building grids, make it stable,<br>
+              Insert tab to make a table.<br>
+              Merge the cells, span the view,<br>
+              Layout tab will see you through.<br>
+              Shading lines, color fill,<br>
+              Design tab completes the skill!
+            </p>
+          </div>
+
+          <!-- Track 6 -->
+          <div class="glass-card" style="box-shadow: 0 10px 30px rgba(0,0,0,0.2)">
+            <div
+              style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-subtle); padding-bottom:10px; margin-bottom:15px">
+              <h3 class="heading-4">Track 6: "Page Perfection"</h3>
+              <button class="btn btn-primary btn-icon" onclick="if(window.AutoRap) window.AutoRap.spit('track6-lyrics')"
+                style="background:#9b5de5; color: white; border-radius:50%; width:40px; height:40px; display:flex; justify-content:center; align-items:center;">
+                🎙️
+              </button>
+            </div>
+            <p id="track6-lyrics"
+              style="font-family: monospace; font-size: 15px; line-height: 1.8; color: var(--text-secondary); background: #0b1120; padding: 20px; border-radius: var(--radius-md)">
+              Margins tight, or margins wide,<br>
+              Layout tab will be your guide.<br>
+              Portrait up, or Landscape laid,<br>
+              Orientation gets it made.<br>
+              Headers high, Footers low,<br>
+              Insert tab puts on the show!
+            </p>
+          </div>
+
+          <!-- Track 7 -->
+          <div class="glass-card" style="box-shadow: 0 10px 30px rgba(0,0,0,0.2)">
+            <div
+              style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-subtle); padding-bottom:10px; margin-bottom:15px">
+              <h3 class="heading-4">Track 7: "Backstage Pass"</h3>
+              <button class="btn btn-primary btn-icon" onclick="if(window.AutoRap) window.AutoRap.spit('track7-lyrics')"
+                style="background:#00BBF9; color: white; border-radius:50%; width:40px; height:40px; display:flex; justify-content:center; align-items:center;">
+                🎙️
+              </button>
+            </div>
+            <p id="track7-lyrics"
+              style="font-family: monospace; font-size: 15px; line-height: 1.8; color: var(--text-secondary); background: #0b1120; padding: 20px; border-radius: var(--radius-md)">
+              File tab click, you're in the back,<br>
+              Export PDF, stay on track.<br>
+              Inspect document, check the properties,<br>
+              Protect with password, no more monstrosities.<br>
+              Print settings, copies one or two,<br>
+              The Backstage view is built for you!
+            </p>
+          </div>
+
+          <!-- Track 8 -->
+          <div class="glass-card" style="box-shadow: 0 10px 30px rgba(0,0,0,0.2)">
+            <div
+              style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-subtle); padding-bottom:10px; margin-bottom:15px">
+              <h3 class="heading-4">Track 8: "Review & Proof"</h3>
+              <button class="btn btn-primary btn-icon" onclick="if(window.AutoRap) window.AutoRap.spit('track8-lyrics')"
+                style="background:#FEE440; color: black; border-radius:50%; width:40px; height:40px; display:flex; justify-content:center; align-items:center;">
+                🎙️
+              </button>
+            </div>
+            <p id="track8-lyrics"
+              style="font-family: monospace; font-size: 15px; line-height: 1.8; color: var(--text-secondary); background: #0b1120; padding: 20px; border-radius: var(--radius-md)">
+              Check the spelling, check the style,<br>
+              The Review tab for the final mile.<br>
+              Track the changes, comments too,<br>
+              Accept or Reject, it's up to you.<br>
+              Thesaurus find the perfect word,<br>
+              Grammar check to not look absurd!
+            </p>
+          </div>
+
+
+          <!-- Mnemonics Cheatsheet -->
+          <div class="glass-card"
+            style="grid-column: 1 / -1; margin-top: var(--space-md); border-left: 4px solid var(--accent-cyan)">
+            <h3 class="heading-3 mb-sm">🧠 The P-A-I-N-T & M-A-R-G-I-N Mnemonics</h3>
+            <div style="display:flex; gap: 40px; flex-wrap:wrap">
+              <div>
+                <h4 style="color:var(--accent-cyan)">Format Painter (PAINT)</h4>
+                <ul style="list-style:none; display:flex; flex-direction:column; gap:8px; margin-top:8px">
+                  <li><b>P</b> - <b>Pick</b> the original text.</li>
+                  <li><b>A</b> - <b>Access</b> the Home tab.</li>
+                  <li><b>I</b> - <b>Identify</b> the paintbrush.</li>
+                  <li><b>N</b> - <b>Now</b> double-click it.</li>
+                  <li><b>T</b> - <b>Target</b> new text to paint!</li>
+                </ul>
+              </div>
+              <div>
+                <h4 style="color:#f72585">Page Layouts (MARGIN)</h4>
+                <ul style="list-style:none; display:flex; flex-direction:column; gap:8px; margin-top:8px">
+                  <li><b>M</b> - <b>Move</b> to Layout tab.</li>
+                  <li><b>A</b> - <b>Adjust</b> Margins first.</li>
+                  <li><b>R</b> - <b>Rotate</b> (Orientation).</li>
+                  <li><b>G</b> - <b>Gauge</b> paper Size.</li>
+                  <li><b>I</b> - <b>Insert</b> Columns if needed.</li>
+                  <li><b>N</b> - <b>Navigate</b> page breaks.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MY RESOURCES PAGE -->
+      <div class="page" id="page-resources" data-title="My Resources">
+        <div class="page__header"
+          style="background: linear-gradient(135deg, #0b1120, #1d3557); padding: var(--space-xl); border-radius: var(--radius-lg); border: 1px solid var(--border-subtle); display:flex; align-items:center; gap: var(--space-lg)">
+          <div style="font-size: 64px">📁</div>
+          <div>
+            <h2 class="heading-1" style="color:white; margin:0">My Resources & AI Hub</h2>
+            <p style="opacity:0.8; font-size:16px">Upload notes, generate questions, create mindmaps, and explain
+              concepts.</p>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg); margin-top: var(--space-lg)">
+          <!-- File Uploader & GenAI -->
+          <div class="glass-card stagger-children">
+            <h3 class="heading-3 mb-md">📤 Upload & Generate</h3>
+            <p class="text-secondary text-sm mb-md">Upload your lecture notes (.txt) to automatically generate MOS-style
+              exam questions and simple explanations.</p>
+            <input type="file" id="resource-file-upload" accept=".txt,.md"
+              style="width:100%; padding:10px; border-radius:8px; background:rgba(0,0,0,0.3); color:white; margin-bottom:15px; border:1px dashed var(--accent-cyan)">
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px">
+              <label class="text-sm">Questions to generate:</label>
+              <input type="number" id="resource-q-amount" value="5" min="1" max="20"
+                style="width:60px; padding:5px; border-radius:5px; background:#0b1120; color:white; border:1px solid rgba(255,255,255,0.2); text-align:center">
+            </div>
+
+            <button class="btn btn-primary w-full" onclick="if(window.Resources) Resources.processFile()">✨ Analyze &
+              Generate</button>
+          </div>
+
+          <!-- Mindmap / Notes -->
+          <div class="glass-card">
+            <h3 class="heading-3 mb-md">🧠 Mindmap & Notes</h3>
+            <p class="text-secondary text-sm mb-md">Jot down quick plans or build a conceptual mindmap.</p>
+            <textarea id="resource-notes" placeholder="Type your study plan or notes here..."
+              style="width:100%; height:120px; background:#0b1120; border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:white; padding:15px; font-family:inherit; resize:vertical; margin-bottom:10px"></textarea>
+            <button class="btn btn-secondary w-full" onclick="if(window.Resources) Resources.saveNotes()">Save
+              Notes</button>
+          </div>
+        </div>
+
+        <!-- AI Output Area -->
+        <div id="resource-output-area" style="display:none; margin-top:var(--space-xl)">
+          <h3 class="heading-2 mb-md">🤖 AI Analysis Output</h3>
+
+          <div style="display:grid; grid-template-columns: 2fr 1fr; gap: var(--space-lg)">
+            <!-- Explanations & Questions -->
+            <div>
+              <div class="glass-card mb-md" id="resource-explanation-box">
+                <h4 class="heading-4 text-gradient">Concept Breakdown</h4>
+                <div id="resource-explanation-content" class="text-secondary text-sm"
+                  style="line-height:1.6; margin-top:10px"></div>
+              </div>
+
+              <div class="glass-card" id="resource-questions-box">
+                <h4 class="heading-4 text-gradient">Generated Practice Quiz</h4>
+                <div id="resource-questions-content" style="margin-top:15px"></div>
+              </div>
+            </div>
+
+            <!-- YouTube References -->
+            <div>
+              <div class="glass-card" style="position:sticky; top:20px">
+                <h4 class="heading-4 mb-md">📺 YouTube References</h4>
+                <p class="text-secondary text-xs mb-md">Based on your upload, here are the best search queries to find
+                  visual tutorials.</p>
+                <div id="resource-youtube-links" style="display:flex; flex-direction:column; gap:10px">
+                  <!-- populated by js -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN KEYGEN PAGE (HIDDEN) -->
+      <div class="page" id="page-admin-keygen" data-title="Admin Keygen">
+        <div class="page__header">
+          <h2 class="page__title">🔑 Admin Keygen</h2>
+          <p class="page__subtitle">Generate Unlock Codes for students manually</p>
+        </div>
+        <div class="glass-card" style="max-width:500px;margin:0 auto">
+          <div style="margin-bottom:var(--space-md)">
+            <label class="text-sm font-bold">1. Enter Student Device ID:</label>
+            <input type="text" id="admin-device-id" placeholder="e.g. X7B9H"
+              style="width:100%;font-size:24px;text-transform:uppercase;letter-spacing:4px;text-align:center"
+              oninput="if(window.AdminKeygen) AdminKeygen.generate()">
+          </div>
+          <div style="margin-bottom:var(--space-md)">
+            <label class="text-sm font-bold" style="color:var(--accent-cyan)">2. Send Them This Unlock Code:</label>
+            <div id="admin-unlock-code"
+              style="background:#0f172a;border:2px solid var(--accent-cyan);border-radius:var(--radius-md);padding:20px;font-size:32px;font-weight:900;text-align:center;letter-spacing:6px;user-select:all;-webkit-user-select:all">
+              ------</div>
+          </div>
+        </div>
+      </div>
+
     </main>
+  </div>
+
+  <!-- FLOATING TOOLS (Timer & Calculator) -->
+  <div id="floating-tools"
+    style="position:fixed; top:80px; right:20px; z-index:9999; display:flex; flex-direction:column; gap:10px;">
+    <button onclick="window.AppTools && window.AppTools.toggleCalc()" class="btn btn-primary"
+      style="border-radius:50%; width:50px; height:50px; padding:0; display:flex; justify-content:center; align-items:center; font-size:24px; box-shadow:0 4px 15px rgba(0,0,0,0.3); background:#3a0ca3; border:none;"
+      title="Scientific Calculator">🧮</button>
+    <button onclick="window.AppTools && window.AppTools.toggleTimer()" class="btn btn-secondary"
+      style="border-radius:50%; width:50px; height:50px; padding:0; display:flex; justify-content:center; align-items:center; font-size:24px; box-shadow:0 4px 15px rgba(0,0,0,0.3); background:var(--gradient-warm); border:none;"
+      title="Study Timer">⏱️</button>
+  </div>
+
+  <!-- CALCULATOR PANEL -->
+  <div id="calc-panel" class="glass-card"
+    style="display:none; position:fixed; top:140px; right:80px; z-index:10000; width:320px; box-shadow:0 10px 40px rgba(0,0,0,0.5); padding:15px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <h4 style="margin:0;color:var(--accent-cyan)">Scientific Calculator</h4>
+      <button onclick="window.AppTools.toggleCalc()"
+        style="background:none;border:none;color:white;cursor:pointer">✖</button>
+    </div>
+    <div id="calc-display"
+      style="width:100%; height:50px; background:#0b1120; border-radius:8px; margin-bottom:10px; color:white; font-size:24px; text-align:right; padding:10px; font-family:monospace; overflow:hidden">
+      0</div>
+    <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px">
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('sin')">sin</button>
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('cos')">cos</button>
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('tan')">tan</button>
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('clear')"
+        style="background:#e63946">C</button>
+
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('log')">log</button>
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('sqrt')">√</button>
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('^')">^</button>
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('/')" style="background:#fca311">/</button>
+
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('7')">7</button>
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('8')">8</button>
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('9')">9</button>
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('*')" style="background:#fca311">×</button>
+
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('4')">4</button>
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('5')">5</button>
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('6')">6</button>
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('-')" style="background:#fca311">-</button>
+
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('1')">1</button>
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('2')">2</button>
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('3')">3</button>
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('+')" style="background:#fca311">+</button>
+
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('0')">0</button>
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('.')">.</button>
+      <button class="btn btn-primary btn-sm" onclick="AppTools.calcInput('=')" style="grid-column: span 2">=</button>
+    </div>
+  </div>
+
+  <!-- TIMER PANEL -->
+  <div id="timer-panel" class="glass-card"
+    style="display:none; position:fixed; top:200px; right:80px; z-index:10000; width:260px; text-align:center; padding:20px; box-shadow:0 10px 40px rgba(0,0,0,0.5)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px">
+      <h4 style="margin:0;color:var(--accent-yellow)">Study Timer</h4>
+      <button onclick="window.AppTools.toggleTimer()"
+        style="background:none;border:none;color:white;cursor:pointer">✖</button>
+    </div>
+    <div id="timer-display"
+      style="font-size:48px; font-weight:900; font-family:monospace; margin-bottom:15px; color:white; text-shadow:0 0 10px rgba(255,255,255,0.3)">
+      25:00</div>
+    <div style="display:flex; gap:10px; margin-bottom:15px">
+      <input type="number" id="timer-minutes" value="25" min="1" max="120"
+        style="width:100%; padding:8px; text-align:center; border-radius:5px; background:rgba(0,0,0,0.2); color:white; border:1px solid rgba(255,255,255,0.2)">
+      <span style="display:flex;align-items:center">min</span>
+    </div>
+    <div style="display:flex; gap:10px">
+      <button class="btn btn-primary w-full" id="timer-start-btn" onclick="AppTools.startTimer()">Start</button>
+      <button class="btn btn-secondary w-full" onclick="AppTools.resetTimer()" style="background:#e63946">Reset</button>
+    </div>
   </div>
 
   <!-- TOAST CONTAINER -->
@@ -404,6 +827,60 @@
     if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
   </script>
 
+  <!-- Sleek Glassmorphism Control Center -->
+  <div
+    style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%); width:90%; max-width:600px; background:rgba(15, 23, 42, 0.7); backdrop-filter:blur(15px); border:1px solid rgba(255,255,255,0.1); border-radius:100px; padding:12px 24px; display:flex; align-items:center; justify-content:space-between; z-index:1000; box-shadow:0 20px 40px rgba(0,0,0,0.4)">
+    <div style="display:flex; align-items:center; gap:12px">
+      <div id="glow-indicator"
+        style="width:10px; height:10px; background:#00f5d4; border-radius:50%; box-shadow:0 0 10px #00f5d4; animation: pulse 2s infinite">
+      </div>
+      <div style="font-size:12px; font-weight:600; color:white; letter-spacing:0.5px">MOS-READY STUDIO</div>
+    </div>
+    <div id="studio-status" style="font-size:11px; color:rgba(255,255,255,0.6); font-family:monospace">IDLE //
+      READY_TO_SPIT</div>
+    <div style="display:flex; gap:10px">
+      <button class="btn btn-icon btn-sm" onclick="if(window.AutoRap)window.AutoRap.stopBeat()"
+        style="background:none; border:1px solid rgba(255,255,255,0.2); color:white; border-radius:50%; width:32px; height:32px">⏹️</button>
+      <button class="btn btn-icon btn-sm" onclick="location.hash='#page-mnemonics'"
+        style="background:linear-gradient(45deg, #00f5d4, #7c5cfc); border:none; color:white; border-radius:50%; width:32px; height:32px; box-shadow: 0 4px 10px rgba(0,245,212,0.3)">🎓</button>
+    </div>
+  </div>
+
+  <style>
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 0 5px #00f5d4;
+      }
+
+      50% {
+        transform: scale(1.3);
+        box-shadow: 0 0 15px #00f5d4;
+      }
+
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 5px #00f5d4;
+      }
+    }
+
+    .page {
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .page:not(.active) {
+      display: none;
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .page.active {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+
   <!-- JS Modules -->
   <script src="/src/js/data/modules.js"></script>
   <script src="/src/js/data/questions.js"></script>
@@ -411,16 +888,18 @@
   <script src="/src/js/utils/xp.js"></script>
   <script src="/src/js/utils/toast.js"></script>
   <script src="/src/js/utils/confetti.js"></script>
+  <script src="/src/js/utils/tools.js"></script>
   <script src="/src/js/core/router.js"></script>
   <script src="/src/js/pages/dashboard.js"></script>
   <script src="/src/js/pages/learn.js"></script>
+  <script src="/src/js/pages/resources.js"></script>
   <script src="/src/js/pages/quizzes.js"></script>
   <script src="/src/js/pages/premium-games.js"></script>
   <script src="/src/js/pages/games.js"></script>
   <script src="/src/js/pages/mock-exam.js"></script>
   <script src="/src/js/pages/practice-exam.js"></script>
-  <script src="/src/js/pages/resources.js"></script>
   <script src="/src/js/pages/word-lab.js"></script>
   <script src="/src/js/app.js"></script>
 </body>
+
 </html>

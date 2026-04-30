@@ -124,66 +124,110 @@ const WordLabPage = {
     const progress = Math.round((completed.length / this.tasks.length) * 100);
 
     if (this.editorMode) {
+      if(!this._activeTab) this._activeTab = 'home';
+      
       // Full rich text editor
       embedArea.innerHTML = `
-        <div style="display:flex;flex-direction:column;height:100%;width:100%">
-          <!-- Editor Toolbar -->
-          <div style="background:var(--bg-surface);border-bottom:1px solid var(--border-subtle);padding:8px 12px;display:flex;flex-wrap:wrap;gap:4px;border-radius:var(--radius-lg) var(--radius-lg) 0 0">
-            <button class="editor-btn" onclick="document.execCommand('bold')" title="Bold (Ctrl+B)"><b>B</b></button>
-            <button class="editor-btn" onclick="document.execCommand('italic')" title="Italic (Ctrl+I)"><i>I</i></button>
-            <button class="editor-btn" onclick="document.execCommand('underline')" title="Underline (Ctrl+U)"><u>U</u></button>
-            <button class="editor-btn" onclick="document.execCommand('strikeThrough')" title="Strikethrough"><s>S</s></button>
-            <div style="width:1px;background:var(--border-default);margin:0 4px"></div>
-            <button class="editor-btn" onclick="document.execCommand('formatBlock','','H1')" title="Heading 1">H1</button>
-            <button class="editor-btn" onclick="document.execCommand('formatBlock','','H2')" title="Heading 2">H2</button>
-            <button class="editor-btn" onclick="document.execCommand('formatBlock','','H3')" title="Heading 3">H3</button>
-            <button class="editor-btn" onclick="document.execCommand('formatBlock','','P')" title="Normal">¶</button>
-            <div style="width:1px;background:var(--border-default);margin:0 4px"></div>
-            <button class="editor-btn" onclick="document.execCommand('justifyLeft')" title="Align Left">⬛◻◻</button>
-            <button class="editor-btn" onclick="document.execCommand('justifyCenter')" title="Center">◻⬛◻</button>
-            <button class="editor-btn" onclick="document.execCommand('justifyRight')" title="Align Right">◻◻⬛</button>
-            <button class="editor-btn" onclick="document.execCommand('justifyFull')" title="Justify">⬛⬛⬛</button>
-            <div style="width:1px;background:var(--border-default);margin:0 4px"></div>
-            <button class="editor-btn" onclick="document.execCommand('insertUnorderedList')" title="Bullets">• List</button>
-            <button class="editor-btn" onclick="document.execCommand('insertOrderedList')" title="Numbers">1. List</button>
-            <button class="editor-btn" onclick="document.execCommand('indent')" title="Indent">→ Tab</button>
-            <button class="editor-btn" onclick="document.execCommand('outdent')" title="Outdent">← Tab</button>
-            <div style="width:1px;background:var(--border-default);margin:0 4px"></div>
-            <button class="editor-btn" onclick="WordLabPage._insertTable()" title="Insert Table">📊</button>
-            <button class="editor-btn" onclick="document.execCommand('insertHorizontalRule')" title="Horizontal Line">—</button>
-            <select onchange="document.execCommand('fontName',false,this.value);this.selectedIndex=0" style="background:var(--bg-glass);color:var(--text-primary);border:1px solid var(--border-default);border-radius:4px;padding:2px 6px;font-size:0.75rem">
-              <option value="">Font</option>
-              <option value="Times New Roman">Times New Roman</option>
-              <option value="Arial">Arial</option>
-              <option value="Calibri">Calibri</option>
-              <option value="Georgia">Georgia</option>
-              <option value="Courier New">Courier New</option>
-            </select>
-            <select onchange="document.execCommand('fontSize',false,this.value);this.selectedIndex=0" style="background:var(--bg-glass);color:var(--text-primary);border:1px solid var(--border-default);border-radius:4px;padding:2px 6px;font-size:0.75rem">
-              <option value="">Size</option>
-              <option value="1">Small</option>
-              <option value="3">Normal</option>
-              <option value="5">Large</option>
-              <option value="7">Huge</option>
-            </select>
+        <div style="display:flex;flex-direction:column;height:100%;width:100%;background:#e1dfdd;font-family:'Segoe UI',sans-serif">
+          
+          <!-- Modern High-Contrast Ribbon Header -->
+          <div style="background:#1d3557;color:white;display:flex;padding:6px 10px 0 10px;font-size:13px;border-bottom:1px solid #10213b">
+             <div onclick="WordLabPage.switchTab('home')" style="padding:6px 16px;cursor:pointer;border-radius:4px 4px 0 0;font-weight:600;${this._activeTab==='home'?'background:#f3f2f1;color:#1d3557':'color:white;opacity:0.8'}">Home</div>
+             <div onclick="WordLabPage.switchTab('insert')" style="padding:6px 16px;cursor:pointer;border-radius:4px 4px 0 0;font-weight:600;${this._activeTab==='insert'?'background:#f3f2f1;color:#1d3557':'color:white;opacity:0.8'}">Insert</div>
+             <div onclick="WordLabPage.switchTab('design')" style="padding:6px 16px;cursor:pointer;border-radius:4px 4px 0 0;font-weight:600;${this._activeTab==='design'?'background:#f3f2f1;color:#1d3557':'color:white;opacity:0.8'}">Design</div>
+             <div onclick="WordLabPage.switchTab('layout')" style="padding:6px 16px;cursor:pointer;border-radius:4px 4px 0 0;font-weight:600;${this._activeTab==='layout'?'background:#f3f2f1;color:#1d3557':'color:white;opacity:0.8'}">Layout</div>
+          </div>
+          
+          <!-- Ribbon Body: Home Tab -->
+          <div id="ribbon-home" style="background:#f3f2f1;border-bottom:1px solid #c8c6c4;padding:8px 12px;display:${this._activeTab==='home'?'flex':'none'};gap:20px;box-shadow:0 2px 4px rgba(0,0,0,0.05);min-height:80px">
+            <!-- Clipboard Group -->
+            <div style="display:flex;flex-direction:column;align-items:center;border-right:1px solid #c8c6c4;padding-right:15px">
+               <div style="display:flex;gap:4px">
+                  <button class="editor-btn" onclick="document.execCommand('copy')" style="background:#fff;border:1px solid #a19f9d;padding:4px 8px;border-radius:2px">✂️ Cut</button>
+                  <button class="editor-btn" onclick="document.execCommand('paste')" style="background:#fff;border:1px solid #a19f9d;padding:4px 8px;border-radius:2px">📋 Paste</button>
+               </div>
+               <span style="font-size:11px;color:#323130;margin-top:6px;font-weight:600">Clipboard</span>
+            </div>
+
+            <!-- Font Group -->
+            <div style="display:flex;flex-direction:column;align-items:center;border-right:1px solid #c8c6c4;padding-right:15px">
+               <div style="display:flex;gap:4px;margin-bottom:6px">
+                  <select onchange="document.execCommand('fontName',false,this.value);this.selectedIndex=0" style="background:#fff;border:1px solid #8a8886;font-size:12px;padding:3px;border-radius:2px">
+                    <option value="">Calibri (Body)</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Arial">Arial</option>
+                    <option value="Georgia">Georgia</option>
+                  </select>
+                  <select onchange="document.execCommand('fontSize',false,this.value);this.selectedIndex=0" style="background:#fff;border:1px solid #8a8886;font-size:12px;padding:3px;border-radius:2px;width:50px">
+                    <option value="3">11</option>
+                    <option value="4">12</option>
+                    <option value="5">14</option>
+                    <option value="6">16</option>
+                  </select>
+               </div>
+               <div style="display:flex;gap:4px">
+                  <button class="editor-btn" style="font-weight:bold;background:#fff;border:1px solid #a19f9d;padding:2px 8px" onclick="document.execCommand('bold')">B</button>
+                  <button class="editor-btn" style="font-style:italic;background:#fff;border:1px solid #a19f9d;padding:2px 8px" onclick="document.execCommand('italic')">I</button>
+                  <button class="editor-btn" style="text-decoration:underline;background:#fff;border:1px solid #a19f9d;padding:2px 8px" onclick="document.execCommand('underline')">U</button>
+                  <div style="width:1px;background:#a19f9d;margin:0 2px"></div>
+                  <input type="color" onchange="document.execCommand('foreColor',false,this.value)" title="Text Color" style="height:24px;width:24px;padding:0;border:none">
+                  <input type="color" onchange="document.execCommand('hiliteColor',false,this.value)" title="Highlight Color" value="#ffff00" style="height:24px;width:24px;padding:0;border:none">
+               </div>
+               <span style="font-size:11px;color:#323130;margin-top:6px;font-weight:600">Font</span>
+            </div>
+
+            <!-- Paragraph Group -->
+            <div style="display:flex;flex-direction:column;align-items:center;border-right:1px solid #c8c6c4;padding-right:15px">
+               <div style="display:flex;gap:4px;margin-bottom:6px">
+                  <button class="editor-btn" onclick="document.execCommand('insertUnorderedList')" style="background:#fff;border:1px solid #a19f9d;padding:2px 8px">•≡</button>
+                  <button class="editor-btn" onclick="document.execCommand('insertOrderedList')" style="background:#fff;border:1px solid #a19f9d;padding:2px 8px">1≡</button>
+               </div>
+               <div style="display:flex;gap:4px">
+                  <button class="editor-btn" onclick="document.execCommand('justifyLeft')" style="background:#fff;border:1px solid #a19f9d;padding:2px 8px">L≡</button>
+                  <button class="editor-btn" onclick="document.execCommand('justifyCenter')" style="background:#fff;border:1px solid #a19f9d;padding:2px 8px">C≡</button>
+                  <button class="editor-btn" onclick="document.execCommand('justifyRight')" style="background:#fff;border:1px solid #a19f9d;padding:2px 8px">R≡</button>
+               </div>
+               <span style="font-size:11px;color:#323130;margin-top:6px;font-weight:600">Paragraph</span>
+            </div>
           </div>
 
-          <!-- Editor Content Area -->
-          <div id="word-editor"
-            contenteditable="true"
-            spellcheck="true"
-            style="flex:1;background:white;color:#222;padding:40px 60px;font-family:'Times New Roman',serif;font-size:14px;
-              line-height:1.8;overflow-y:auto;outline:none;min-height:500px;
-              box-shadow:inset 0 2px 8px rgba(0,0,0,0.1);border-radius:0 0 var(--radius-lg) var(--radius-lg)"
-          >
-            <p style="color:#888;font-style:italic">Start typing here... This is your Word practice area. Try the tasks on the left panel!</p>
+          <!-- Ribbon Body: Insert Tab -->
+          <div id="ribbon-insert" style="background:#f3f2f1;border-bottom:1px solid #c8c6c4;padding:8px 12px;display:${this._activeTab==='insert'?'flex':'none'};gap:20px;box-shadow:0 2px 4px rgba(0,0,0,0.05);min-height:80px">
+             <div style="display:flex;flex-direction:column;align-items:center;border-right:1px solid #c8c6c4;padding-right:15px">
+                <button class="editor-btn" onclick="WordLabPage._insertTable()" style="background:#fff;border:1px solid #a19f9d;padding:10px 15px;border-radius:2px;font-size:16px">📊 Table</button>
+                <span style="font-size:11px;color:#323130;margin-top:6px;font-weight:600">Tables</span>
+             </div>
+             <div style="display:flex;flex-direction:column;align-items:center;border-right:1px solid #c8c6c4;padding-right:15px">
+                <button class="editor-btn" onclick="document.execCommand('insertHorizontalRule')" style="background:#fff;border:1px solid #a19f9d;padding:10px 15px;border-radius:2px">➖ Horiz. Line</button>
+                <span style="font-size:11px;color:#323130;margin-top:6px;font-weight:600">Illustrations</span>
+             </div>
+             <div style="display:flex;flex-direction:column;align-items:center;padding-right:15px">
+                <button class="editor-btn" onclick="document.execCommand('createLink',false,prompt('URL:','http://'))" style="background:#fff;border:1px solid #a19f9d;padding:10px 15px;border-radius:2px">🔗 Link</button>
+                <span style="font-size:11px;color:#323130;margin-top:6px;font-weight:600">Links</span>
+             </div>
+          </div>
+
+          <!-- Ribbon Body: Design & Layout Tabs (Stubs) -->
+          <div id="ribbon-other" style="background:#f3f2f1;border-bottom:1px solid #c8c6c4;padding:8px 12px;display:${(this._activeTab==='design'||this._activeTab==='layout')?'flex':'none'};align-items:center;justify-content:center;box-shadow:0 2px 4px rgba(0,0,0,0.05);min-height:80px">
+             <p style="color:#605e5c;font-size:13px;font-style:italic">This tab contains advanced features available in the full MOS exam environment.</p>
+          </div>
+
+          <!-- Document Workspace Area (A4 Paper emulation) -->
+          <div style="flex:1;background:#e1dfdd;overflow-y:auto;display:flex;justify-content:center;padding:30px 20px">
+             <div id="word-editor"
+                  contenteditable="true"
+                  spellcheck="true"
+                  style="background:white;width:21cm;min-height:29.7cm;padding:2.54cm;font-family:'Calibri',sans-serif;font-size:11pt;line-height:1.15;color:#000;box-shadow:0 4px 6px rgba(0,0,0,0.1);outline:none">
+                <p style="color:#888;font-style:italic">Start typing here... Try completing the tasks on the left.</p>
+             </div>
           </div>
 
           <!-- Editor Status Bar -->
-          <div style="display:flex;justify-content:space-between;padding:6px 12px;background:var(--bg-surface);border-top:1px solid var(--border-subtle);font-size:0.7rem;color:var(--text-tertiary)">
-            <span>📄 MOS-READY Word Editor</span>
+          <div style="display:flex;justify-content:space-between;padding:4px 12px;background:#f3f2f1;border-top:1px solid #e1dfdd;font-size:12px;color:#605e5c;font-family:'Segoe UI',sans-serif">
+            <span>Page 1 of 1</span>
+            <span id="word-count-display">0 words</span>
+            <span>English (US)</span>
             <span>Progress: ${progress}%</span>
-            <span id="word-count-display">Words: 0</span>
           </div>
         </div>
       `;
@@ -246,6 +290,11 @@ const WordLabPage = {
         </div>
       `;
     }
+  },
+
+  switchTab(tabName) {
+    this._activeTab = tabName;
+    this._updateEmbed();
   },
 
   _insertTable() {

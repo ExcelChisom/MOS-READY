@@ -61,130 +61,96 @@ const PracticeExamPage = {
   },
 
   initiatePayment() {
-    // Paystack integration
-    // In production, payment would be verified server-side
-    // The Paystack public key and account details are handled server-side for security
-
     const modal = document.getElementById('modal-overlay');
     const content = document.getElementById('modal-content');
 
+    if(!window.DeviceAuth) {
+      window.DeviceAuth = {
+        getDeviceId() {
+          let id = localStorage.getItem('mosready_deviceId');
+          if (!id) {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            id = Array.from({length: 5}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+            localStorage.setItem('mosready_deviceId', id);
+          }
+          return id;
+        },
+        generateCode(deviceId) {
+          let hash = 0;
+          for (let i = 0; i < deviceId.length; i++) {
+              hash = (hash << 5) - hash + deviceId.charCodeAt(i);
+              hash |= 0;
+          }
+          let magic = Math.abs(hash * 31337 + 9991).toString(36).toUpperCase();
+          return magic.padStart(6, 'X').substring(0, 6);
+        },
+        verifyCode(deviceId, inputCode) {
+          return this.generateCode(deviceId) === inputCode.trim().toUpperCase();
+        }
+      };
+    }
+
+    const deviceId = window.DeviceAuth.getDeviceId();
+
     content.innerHTML = `
-      <div class="modal__header">
-        <span class="modal__title">💳 Payment</span>
-        <button class="btn btn-ghost btn-icon" onclick="document.getElementById('modal-overlay').classList.remove('active')">✕</button>
-      </div>
-      <div style="text-align:center">
-        <div style="font-size:48px;margin-bottom:var(--space-md)">💳</div>
-        <h3 class="heading-3 mb-sm">Complete Practice Exam</h3>
-        <p class="text-secondary mb-lg">2 exam attempts for ₦250</p>
-
-        <div class="glass-card mb-lg" style="text-align:left">
+      <div style="padding:var(--space-md)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-md)">
+          <h3 class="heading-3">Unlock Practice Exam</h3>
+          <button class="btn btn-ghost" onclick="document.getElementById('modal-overlay').classList.remove('active')">✕</button>
+        </div>
+        
+        <div class="glass-card mb-md" style="background:rgba(255,255,255,0.02)">
           <div style="display:flex;justify-content:space-between;margin-bottom:var(--space-sm)">
-            <span>Practice Exam (2 attempts)</span>
-            <span class="font-bold">₦250</span>
+            <span class="font-bold">Total Amount</span>
+            <span class="font-bold text-gradient" style="font-size:1.2em">₦250.00</span>
           </div>
-          <hr style="border:none;border-top:1px solid var(--border-subtle);margin:var(--space-sm) 0">
-          <div style="display:flex;justify-content:space-between">
-            <span class="font-bold">Total</span>
-            <span class="font-bold text-gradient">₦250.00</span>
+          <p class="text-xs text-secondary">Grants 2 premium mock exam attempts</p>
+        </div>
+
+        <div style="background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius-md);padding:var(--space-md);margin-bottom:var(--space-md)">
+          <p class="text-sm font-bold mb-xs text-secondary">1. Transfer to:</p>
+          <div style="font-family:monospace;font-size:16px;margin-bottom:var(--space-sm)">
+            <div>Bank: <span class="text-primary font-bold">OPay</span></div>
+            <div>Account: <span class="text-primary font-bold" style="user-select:all;-webkit-user-select:all">7042587335</span></div>
+            <div>Name: <span class="text-primary font-bold">Barachel Onofuevure</span></div>
           </div>
         </div>
 
-        <div style="margin-bottom:var(--space-lg)">
-          <input type="email" id="payment-email" placeholder="Your email address"
-            style="width:100%;margin-bottom:var(--space-sm)">
+        <div style="background:rgba(124, 92, 252, 0.1);border:1px dashed var(--primary-500);border-radius:var(--radius-md);padding:var(--space-md);text-align:center;margin-bottom:var(--space-md)">
+           <p class="text-sm font-bold mb-xs">2. Send your receipt on Telegram</p>
+           <p class="text-xs text-secondary mb-sm">Include your unique Device ID below so we can generate your unlock key.</p>
+           <div style="font-size:24px;font-family:monospace;font-weight:900;letter-spacing:2px;color:var(--accent-yellow);margin-bottom:var(--space-sm);user-select:all;-webkit-user-select:all">${deviceId}</div>
+           <a href="https://t.me/+Rskj7UAtxrAxY2U0" target="_blank" class="btn btn-secondary w-full" style="background:#24A1DE;color:white;border:none">
+              ✈️ Send Receipt on Telegram
+           </a>
         </div>
 
-        <button class="btn btn-primary btn-lg w-full" id="confirm-payment-btn" onclick="PracticeExamPage.processPayment()">
-          Pay ₦250 with Card 💳
-        </button>
-        <p class="text-xs text-tertiary mt-md">Secured by Paystack • Card payment</p>
+        <div style="margin-top:var(--space-lg)">
+          <p class="text-sm font-bold mb-xs">3. Enter your Unlock Code</p>
+          <input type="text" id="pexam-unlock-code" placeholder="e.g. X7B9HQ" 
+            style="width:100%;text-align:center;font-size:20px;letter-spacing:4px;text-transform:uppercase;margin-bottom:var(--space-md)">
+          <button class="btn btn-primary btn-lg w-full" onclick="PracticeExamPage.verifyUnlock()">
+            🔓 Verify & Unlock
+          </button>
+        </div>
       </div>
     `;
 
     modal.classList.add('active');
   },
 
-  async processPayment() {
-    const email = document.getElementById('payment-email')?.value;
-    if (!email || !email.includes('@')) {
-      Toast.error('Please enter a valid email address');
+  verifyUnlock() {
+    const code = document.getElementById('pexam-unlock-code')?.value;
+    if (!code || code.length < 4) {
+      Toast.error('Please enter a valid unlock code');
       return;
     }
-
-    const confirmBtn = document.getElementById('confirm-payment-btn');
-    confirmBtn.textContent = 'Processing...';
-    confirmBtn.disabled = true;
-
-    try {
-      // Call server to initialize payment
-      const response = await fetch('/api/payment/initialize', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, amount: 25000 }) // Amount in kobo (₦250 = 25000 kobo)
-      });
-
-      const data = await response.json();
-
-      if (data.success && data.authorization_url) {
-        // Redirect to Paystack payment page
-        window.open(data.authorization_url, '_blank');
-
-        // Show verification UI
-        const content = document.getElementById('modal-content');
-        content.innerHTML = `
-          <div style="text-align:center;padding:var(--space-lg)">
-            <div style="font-size:48px;margin-bottom:var(--space-md)" class="animate-float">🔄</div>
-            <h3 class="heading-3 mb-sm">Complete Payment</h3>
-            <p class="text-secondary mb-lg">A payment window has opened. Complete the payment there, then click verify below.</p>
-            <button class="btn btn-primary btn-lg w-full" onclick="PracticeExamPage.verifyPayment('${data.reference}')">
-              ✅ I've Completed Payment — Verify
-            </button>
-            <button class="btn btn-ghost mt-md" onclick="document.getElementById('modal-overlay').classList.remove('active')">
-              Cancel
-            </button>
-          </div>
-        `;
-      } else {
-        // Fallback: simulate payment for demo/offline mode
-        this._simulatePayment();
-      }
-    } catch (error) {
-      // Server not available — simulate payment for demo
-      this._simulatePayment();
-    }
-  },
-
-  _simulatePayment() {
-    // Demo mode: simulate successful payment
-    const content = document.getElementById('modal-content');
-    content.innerHTML = `
-      <div style="text-align:center;padding:var(--space-lg)">
-        <div style="font-size:48px;margin-bottom:var(--space-md)" class="animate-float">🔄</div>
-        <h3 class="heading-3 mb-sm">Demo Mode</h3>
-        <p class="text-secondary mb-lg">Payment server not available. Click below to simulate a successful payment for testing.</p>
-        <button class="btn btn-primary btn-lg w-full" onclick="PracticeExamPage.confirmPaymentSuccess()">
-          ✅ Simulate Successful Payment
-        </button>
-        <button class="btn btn-ghost mt-md" onclick="document.getElementById('modal-overlay').classList.remove('active')">
-          Cancel
-        </button>
-      </div>
-    `;
-  },
-
-  async verifyPayment(reference) {
-    try {
-      const response = await fetch(`/api/payment/verify/${reference}`);
-      const data = await response.json();
-
-      if (data.success) {
-        this.confirmPaymentSuccess();
-      } else {
-        Toast.error('Payment not confirmed. Please try again.');
-      }
-    } catch {
-      Toast.error('Could not verify payment. Please contact support.');
+    
+    const deviceId = window.DeviceAuth.getDeviceId();
+    if (window.DeviceAuth.verifyCode(deviceId, code)) {
+      this.confirmPaymentSuccess();
+    } else {
+      Toast.error('❌ Invalid Unlock Code for this device');
     }
   },
 
