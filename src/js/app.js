@@ -26,11 +26,9 @@ document.addEventListener('keydown', e => {
     // Initialize pages
     DashboardPage.init();
     LearnPage.init();
-    if(window.PremiumGames) window.PremiumGames.init();
     if(window.GamesPage) window.GamesPage.init();
     if(window.Resources) window.Resources.init();
     QuizzesPage.init();
-    GamesPage.init();
     MockExamPage.init();
     PracticeExamPage.init();
     WordLabPage.init();
