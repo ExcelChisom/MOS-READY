@@ -611,69 +611,85 @@
           <div style="font-size: 64px">📁</div>
           <div>
             <h2 class="heading-1" style="color:white; margin:0">My Resources & AI Hub</h2>
-            <p style="opacity:0.8; font-size:16px">Upload notes, generate questions, create mindmaps, and explain
-              concepts.</p>
+            <p style="opacity:0.8; font-size:16px">Upload notes, generate questions, create mindmaps, and explain concepts.</p>
           </div>
         </div>
 
+        <!-- TOP ROW: Upload + Notes Manager -->
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg); margin-top: var(--space-lg)">
+          
           <!-- File Uploader & GenAI -->
-          <div class="glass-card stagger-children">
+          <div class="glass-card">
             <h3 class="heading-3 mb-md">📤 Upload & Generate</h3>
-            <p class="text-secondary text-sm mb-md">Upload your lecture notes (.txt) to automatically generate MOS-style
-              exam questions and simple explanations.</p>
-            <input type="file" id="resource-file-upload" accept=".txt,.md"
+            <p class="text-secondary text-sm mb-md">Upload lecture notes to auto-generate MOS-style exam questions. Supports <b>.txt, .md, .docx, .rtf, .pdf, .doc</b> files.</p>
+            <input type="file" id="resource-file-upload" accept=".txt,.md,.docx,.rtf,.pdf,.doc,.csv"
               style="width:100%; padding:10px; border-radius:8px; background:rgba(0,0,0,0.3); color:white; margin-bottom:15px; border:1px dashed var(--accent-cyan)">
-
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px">
               <label class="text-sm">Questions to generate:</label>
               <input type="number" id="resource-q-amount" value="5" min="1" max="20"
                 style="width:60px; padding:5px; border-radius:5px; background:#0b1120; color:white; border:1px solid rgba(255,255,255,0.2); text-align:center">
             </div>
-
-            <button class="btn btn-primary w-full" onclick="if(window.Resources) Resources.processFile()">✨ Analyze &
-              Generate</button>
+            <button class="btn btn-primary w-full" onclick="if(window.Resources) Resources.processFile()">✨ Analyze & Generate</button>
           </div>
 
-          <!-- Mindmap / Notes -->
+          <!-- Notes Manager -->
           <div class="glass-card">
-            <h3 class="heading-3 mb-md">🧠 Mindmap & Notes</h3>
-            <p class="text-secondary text-sm mb-md">Jot down quick plans or build a conceptual mindmap.</p>
-            <textarea id="resource-notes" placeholder="Type your study plan or notes here..."
-              style="width:100%; height:120px; background:#0b1120; border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:white; padding:15px; font-family:inherit; resize:vertical; margin-bottom:10px"></textarea>
-            <button class="btn btn-secondary w-full" onclick="if(window.Resources) Resources.saveNotes()">Save
-              Notes</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: var(--space-md)">
+              <h3 class="heading-3" style="margin:0">📝 My Notes</h3>
+              <button class="btn btn-secondary" onclick="if(window.Resources) Resources.createNote()" 
+                style="padding:6px 14px; font-size:13px">+ New Note</button>
+            </div>
+            <div id="resource-notes-list" style="max-height:220px; overflow-y:auto; padding-right:5px">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Note Editor -->
+        <div class="glass-card" style="margin-top: var(--space-lg)">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: var(--space-md)">
+            <h3 class="heading-3" style="margin:0">✏️ <span id="resource-note-title">No note selected</span></h3>
+            <div style="display:flex; gap:8px">
+              <button class="btn btn-secondary" onclick="if(window.Resources) Resources.generateMindmap()" style="padding:6px 14px; font-size:13px">🧠 Generate Mindmap</button>
+              <button class="btn btn-primary" onclick="if(window.Resources) Resources.saveNotes()" style="padding:6px 14px; font-size:13px">💾 Save</button>
+            </div>
+          </div>
+          <textarea id="resource-notes" placeholder="Select or create a note to start writing..."
+            style="width:100%; height:200px; background:#0b1120; border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:white; padding:15px; font-family:inherit; resize:vertical; line-height:1.7; font-size:14px"></textarea>
+        </div>
+
+        <!-- Mindmap Area -->
+        <div id="resource-mindmap-area" style="display:none; margin-top:var(--space-lg)">
+          <div class="glass-card">
+            <h3 class="heading-3 mb-md">🧠 Visual Mindmap</h3>
+            <p class="text-secondary text-sm mb-md">Auto-generated from your notes. MOS concepts are highlighted as branches.</p>
+            <div class="mindmap-canvas-wrap" style="border-radius:12px; overflow:hidden; border:1px solid rgba(124,92,252,0.2)">
+              <canvas id="mindmap-canvas" style="width:100%; height:500px; display:block; background:#0a0a1a"></canvas>
+            </div>
           </div>
         </div>
 
         <!-- AI Output Area -->
         <div id="resource-output-area" style="display:none; margin-top:var(--space-xl)">
           <h3 class="heading-2 mb-md">🤖 AI Analysis Output</h3>
-
           <div style="display:grid; grid-template-columns: 2fr 1fr; gap: var(--space-lg)">
             <!-- Explanations & Questions -->
             <div>
               <div class="glass-card mb-md" id="resource-explanation-box">
                 <h4 class="heading-4 text-gradient">Concept Breakdown</h4>
-                <div id="resource-explanation-content" class="text-secondary text-sm"
-                  style="line-height:1.6; margin-top:10px"></div>
+                <div id="resource-explanation-content" class="text-secondary text-sm" style="line-height:1.6; margin-top:10px"></div>
               </div>
-
               <div class="glass-card" id="resource-questions-box">
                 <h4 class="heading-4 text-gradient">Generated Practice Quiz</h4>
                 <div id="resource-questions-content" style="margin-top:15px"></div>
               </div>
             </div>
-
             <!-- YouTube References -->
             <div>
               <div class="glass-card" style="position:sticky; top:20px">
                 <h4 class="heading-4 mb-md">📺 YouTube References</h4>
-                <p class="text-secondary text-xs mb-md">Based on your upload, here are the best search queries to find
-                  visual tutorials.</p>
-                <div id="resource-youtube-links" style="display:flex; flex-direction:column; gap:10px">
-                  <!-- populated by js -->
-                </div>
+                <p class="text-secondary text-xs mb-md">Based on your upload, search for visual tutorials.</p>
+                <div id="resource-youtube-links" style="display:flex; flex-direction:column; gap:10px"></div>
               </div>
             </div>
           </div>
