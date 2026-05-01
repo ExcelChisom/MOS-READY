@@ -121,33 +121,47 @@ window.AppTools = {
   _eval(expr) {
     if (!expr || !expr.trim()) return 0;
     let e = expr;
-    // Replace constants
-    e = e.replace(/\bPI\b/g, String(Math.PI));
-    e = e.replace(/\bE\b/g, String(Math.E));
-    // Replace functions
-    e = e.replace(/\basin\(/g, 'Math.asin(');
-    e = e.replace(/\bacos\(/g, 'Math.acos(');
-    e = e.replace(/\batan\(/g, 'Math.atan(');
-    e = e.replace(/\bsin\(/g, 'Math.sin(');
-    e = e.replace(/\bcos\(/g, 'Math.cos(');
-    e = e.replace(/\btan\(/g, 'Math.tan(');
-    e = e.replace(/\blog\(/g, 'Math.log10(');
-    e = e.replace(/\bln\(/g, 'Math.log(');
-    e = e.replace(/\bsqrt\(/g, 'Math.sqrt(');
-    e = e.replace(/\bcbrt\(/g, 'Math.cbrt(');
-    e = e.replace(/\babs\(/g, 'Math.abs(');
-    e = e.replace(/\bexp\(/g, 'Math.exp(');
-    // Replace ^ with **
+
+    // Normalize trig variations
+    e = e.replace(/\b(sin|cos|tan|asin|acos|atan|log|ln)-1\s*\(/g, 'a$1(');
+    e = e.replace(/\binv(sin|cos|tan)\s*\(/g, 'a$1(');
+    e = e.replace(/\b(sin|cos|tan|asin|acos|atan|log|ln)\b\s*(\d+(\.\d+)?)/g, '$1($2)');
+
+    // Convert operators to valid JS
     e = e.replace(/\^/g, '**');
-    // Replace × ÷ − with JS operators
     e = e.replace(/×/g, '*');
     e = e.replace(/÷/g, '/');
     e = e.replace(/−/g, '-');
-    const result = new Function('return (' + e + ')')();
-    if (typeof result !== 'number' || !isFinite(result)) throw new Error('Bad');
-    // Clean formatting
-    if (Number.isInteger(result)) return result;
-    return parseFloat(result.toPrecision(12));
+
+    const mathScope = {
+      sin: (deg) => Math.sin(deg * Math.PI / 180),
+      cos: (deg) => Math.cos(deg * Math.PI / 180),
+      tan: (deg) => Math.tan(deg * Math.PI / 180),
+      asin: (val) => Math.asin(val) * 180 / Math.PI,
+      acos: (val) => Math.acos(val) * 180 / Math.PI,
+      atan: (val) => Math.atan(val) * 180 / Math.PI,
+      log: (val) => Math.log10(val),
+      ln: (val) => Math.log(val),
+      sqrt: (val) => Math.sqrt(val),
+      cbrt: (val) => Math.cbrt(val),
+      abs: (val) => Math.abs(val),
+      exp: (val) => Math.exp(val),
+      PI: Math.PI,
+      E: Math.E
+    };
+
+    const scopeKeys = Object.keys(mathScope);
+    const scopeValues = Object.values(mathScope);
+
+    try {
+      const fn = new Function(...scopeKeys, 'return (' + e + ')');
+      const result = fn(...scopeValues);
+      if (typeof result !== 'number' || !isFinite(result)) throw new Error('Bad');
+      if (Number.isInteger(result)) return result;
+      return parseFloat(result.toPrecision(12));
+    } catch (err) {
+      throw new Error('Bad Expression');
+    }
   },
 
   // ==========================================
