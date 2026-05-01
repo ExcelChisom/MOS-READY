@@ -203,13 +203,19 @@ window.AppTools = {
       let vid = ''; let list = '';
       const vm = url.match(/[?&]v=([\w-]+)/); if (vm) vid = vm[1];
       const lm = url.match(/[?&]list=([\w-]+)/); if (lm) list = lm[1];
-      if (!vid) { const sm = url.match(/youtu\.be\/([\w-]+)/); if (sm) vid = sm[1]; }
-      if (list) html = '<iframe src="https://www.youtube.com/embed/videoseries?list=' + list + '&autoplay=1" style="width:100%;height:200px;border:none;border-radius:8px" allow="autoplay;encrypted-media" allowfullscreen></iframe>';
-      else if (vid) html = '<iframe src="https://www.youtube.com/embed/' + vid + '?autoplay=1" style="width:100%;height:200px;border:none;border-radius:8px" allow="autoplay;encrypted-media" allowfullscreen></iframe>';
-      else html = '<p style="color:#f72585;font-size:13px">Could not parse YouTube URL. Try a direct video or playlist link.</p>';
+      const sm = url.match(/youtu\.be\/([\w-]+)/); if (sm) vid = sm[1];
+      const shm = url.match(/youtube\.com\/shorts\/([\w-]+)/); if (shm) vid = shm[1];
+
+      if (list) {
+        html = '<iframe src="https://www.youtube.com/embed/videoseries?list=' + list + '&autoplay=1" style="width:100%;height:200px;border:none;border-radius:8px" allow="autoplay;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>';
+      } else if (vid) {
+        html = '<iframe src="https://www.youtube.com/embed/' + vid + '?autoplay=1" style="width:100%;height:200px;border:none;border-radius:8px" allow="autoplay;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>';
+      } else {
+        html = '<p style="color:#f72585;font-size:13px">Could not parse YouTube URL. Try a direct video or playlist link.</p>';
+      }
     } else if (url.includes('spotify.com')) {
       const embed = url.replace('open.spotify.com/', 'open.spotify.com/embed/');
-      html = '<iframe src="' + embed + '" style="width:100%;height:152px;border:none;border-radius:12px" allow="autoplay;encrypted-media;clipboard-write" allowfullscreen></iframe>';
+      html = '<iframe src="' + embed + '" style="width:100%;height:152px;border:none;border-radius:12px" allow="autoplay;encrypted-media;clipboard-write;picture-in-picture" allowfullscreen></iframe>';
     } else if (url.includes('soundcloud.com')) {
       html = '<iframe src="https://w.soundcloud.com/player/?url=' + encodeURIComponent(url) + '&auto_play=true&color=%237c5cfc" style="width:100%;height:166px;border:none" allow="autoplay"></iframe>';
     } else if (url.match(/\.(mp3|ogg|wav|m4a|aac|flac|webm)(\?.*)?$/i)) {

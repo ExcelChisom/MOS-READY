@@ -148,13 +148,18 @@ const WordLabPage = {
     this.wordLaunched = true;
     this._updateEmbed();
 
+    // Redundant launch methods:
     try {
-      window.open('ms-word:', '_blank');
+      // 1. Direct Office URI Scheme (Protocol Handler)
+      window.location.href = 'ms-word:ofv|u|';
     } catch (e) {
-      // Ignore
+      try {
+        // 2. Fallback secondary direct protocol
+        window.open('ms-word:');
+      } catch (e2) {}
     }
 
-    Toast.info('Please open Microsoft Word manually. Complete tasks and check them off!');
+    Toast.info('Attempting to launch MS Word on your device. If it does not open, please start Microsoft Word manually or click the link above.');
   },
 
   // Open the built-in rich text editor (for users without MS Word)
@@ -326,9 +331,12 @@ const WordLabPage = {
             <p class="font-semibold mb-md">Choose Your Practice Mode</p>
             <p class="text-sm text-secondary mb-xl">Use Microsoft Word on your computer, or practice with our built-in editor</p>
           </div>
-          <div style="display:flex;gap:var(--space-md);justify-content:center;margin-top:var(--space-lg)">
+          <div style="display:flex;gap:var(--space-md);justify-content:center;margin-top:var(--space-lg);flex-wrap:wrap">
             <button class="btn btn-primary" onclick="WordLabPage.launchWord()">
               📄 Launch MS Word
+            </button>
+            <button class="btn btn-secondary" onclick="window.open('https://office.live.com/start/Word.aspx', '_blank')">
+              🌐 Use Word Online
             </button>
             <button class="btn btn-secondary" onclick="WordLabPage.openEditor()">
               ✏️ Use Built-in Editor

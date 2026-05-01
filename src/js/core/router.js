@@ -81,6 +81,7 @@ const Router = {
       'practice-exam': 'Practice Exam',
       'resources': 'My Resources',
       'relax': 'Relax & Fun Games',
+      'qa-forum': 'Q&A Forum',
       'word-lab': 'Word Lab',
       'admin-keygen': 'Admin Keygen',
       'mnemonics': 'Mnemonics & Rap'

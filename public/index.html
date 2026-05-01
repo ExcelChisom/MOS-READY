@@ -76,6 +76,10 @@
           <span class="nav-tab__icon">🌴</span>
           Relax Games
         </button>
+        <button class="nav-tab" data-page="qa-forum" id="nav-qa-forum">
+          <span class="nav-tab__icon">💬</span>
+          Q&A Forum
+        </button>
 
         <div class="sidebar__section-label" style="margin-top:var(--space-md)">Exams</div>
         <button class="nav-tab" data-page="mock-exam" id="nav-mock-exam">
@@ -427,6 +431,37 @@
         </div>
       </div>
 
+      <!-- Q&A FORUM PAGE -->
+      <div class="page" id="page-qa-forum" data-title="Q&A Forum">
+        <div class="page__header" style="background:linear-gradient(135deg,#0b1120,#3b2244);padding:var(--space-xl);border-radius:var(--radius-lg);border:1px solid var(--border-subtle);display:flex;align-items:center;gap:var(--space-lg)">
+          <div style="font-size:64px">💬</div>
+          <div>
+            <h2 class="heading-1" style="color:white;margin:0">Q&A Forum</h2>
+            <p style="opacity:0.8;font-size:16px">The central hub to ask, discuss, and answer MOS questions collectively.</p>
+          </div>
+        </div>
+
+        <!-- Add a Question Form -->
+        <div class="glass-card" style="margin-top:var(--space-lg)">
+          <h3 class="heading-3 mb-md">➕ Ask the Community</h3>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <input type="text" id="qa-new-title" placeholder="What is your exact question? e.g. How to change cell alignment?"
+              style="width:100%;padding:12px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0b1120;color:white;font-size:14px">
+            <textarea id="qa-new-desc" placeholder="Add additional details or context to your question..."
+              style="width:100%;height:80px;padding:12px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0b1120;color:white;font-size:14px;resize:vertical"></textarea>
+            <button class="btn btn-primary" onclick="if(window.QaForumPage) QaForumPage.askQuestion()" style="align-self:flex-start">🚀 Post Question</button>
+          </div>
+        </div>
+
+        <!-- Question & Answer Pool -->
+        <div style="margin-top:var(--space-xl)">
+          <h3 class="heading-3 mb-md">📥 Community Pool</h3>
+          <div id="qa-pool-list" style="display:flex;flex-direction:column;gap:16px">
+            <!-- Populated via QaForumPage.renderPool() -->
+          </div>
+        </div>
+      </div>
+
       <!-- WORD LAB PAGE -->
       <div class="page" id="page-word-lab" data-title="Word Lab">
         <div class="page__header">
@@ -684,6 +719,18 @@
             <h2 class="heading-1" style="color:white; margin:0">My Resources & AI Hub</h2>
             <p style="opacity:0.8; font-size:16px">Upload notes, generate questions, create mindmaps, manage tasks, and get concept breakdowns.</p>
           </div>
+        </div>
+
+        <!-- ROW 0: AI Direct Question Hub -->
+        <div class="glass-card" style="margin-top:var(--space-lg); border: 1px solid var(--accent-cyan); background:rgba(0,245,212,0.05)">
+          <h3 class="heading-3 mb-md" style="color:var(--accent-cyan)">🤖 AI Direct Question Hub</h3>
+          <p class="text-secondary text-sm mb-md">Ask any question directly to the MOS AI and receive simple, precise conceptual answers.</p>
+          <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap">
+            <input type="text" id="ai-hub-query" placeholder="Ask AI e.g. What are page breaks used for? Or What are margins?"
+              style="flex:1; min-width:280px; padding:12px 16px; border-radius:8px; border:1px solid rgba(255,255,255,0.15); background:#0b1120; color:white; font-size:14px">
+            <button class="btn btn-primary" onclick="if(window.Resources) Resources.askAiQuestion()">✨ Ask AI</button>
+          </div>
+          <div id="ai-hub-response" style="margin-top:14px"></div>
         </div>
 
         <!-- ROW 1: Upload + Notes Manager -->
@@ -997,6 +1044,7 @@
   <script src="/src/js/pages/practice-exam.js"></script>
   <script src="/src/js/pages/word-lab.js"></script>
   <script src="/src/js/pages/relax-games.js"></script>
+  <script src="/src/js/pages/qa-forum.js"></script>
   <script src="/src/js/app.js"></script>
 </body>
 </html>

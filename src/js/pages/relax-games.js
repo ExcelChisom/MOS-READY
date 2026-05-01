@@ -1,11 +1,11 @@
 /**
  * MOS-READY — Relax & Fun Games
- * Burger Builder (cooking game) + Virtual Monopoly
+ * Burger Builder + Multiplayer Monopoly with rule book and linking
  */
 window.RelaxGames = {
 
   // ==========================================
-  // BURGER BUILDER (ShawarmaHelper-style cooking game)
+  // BURGER BUILDER
   // ==========================================
   burgerState: null,
 
@@ -56,13 +56,11 @@ window.RelaxGames = {
   addLayer(layer) {
     const s = this.burgerState;
     if (!s || s.gameOver) return;
-    const expected = s.order.layers[s.placed.length];
     s.placed.push(layer);
     this._renderBurger();
 
     if (s.placed.length === s.order.layers.length) {
       clearInterval(s.timer);
-      // Check accuracy
       let correct = 0;
       for (let i = 0; i < s.order.layers.length; i++) {
         if (s.placed[i] === s.order.layers[i]) correct++;
@@ -126,12 +124,11 @@ window.RelaxGames = {
   },
 
   // ==========================================
-  // MONOPOLY (Local / Pass-and-Play + CPU)
+  // MONOPOLY
   // ==========================================
   monoState: null,
 
-  startMonopoly(mode) {
-    // mode: 'solo' (vs CPU), 'local' (pass-and-play 2p)
+  startMonopoly(mode, shareCode = null) {
     const properties = [
       { name: 'GO', type: 'go', color: '#fff', price: 0 },
       { name: 'Ribbon Ave', type: 'prop', color: '#8B4513', price: 60 },
@@ -164,17 +161,37 @@ window.RelaxGames = {
       players.push({ name: 'Player 2', emoji: '🎲', money: 1500, pos: 0, owned: [], isCpu: false, jailed: 0 });
     }
 
+    const code = shareCode || Math.random().toString(36).substring(2, 7).toUpperCase();
+
     this.monoState = {
       board: properties,
       players: players,
       current: 0,
       dice: [0, 0],
-      message: 'Roll the dice to start!',
-      log: [],
+      message: 'Welcome! Read the rules below or roll dice to start playing.',
+      log: ['🎮 Game Started! Session ID: ' + code],
       gameOver: false,
-      turnPhase: 'roll' // 'roll', 'action', 'done'
+      turnPhase: 'roll',
+      code: code,
+      mode: mode,
+      showRulebook: true
     };
 
+    this._renderMono();
+  },
+
+  monoJoin() {
+    const code = prompt('Enter your friend\'s 5-character session code:');
+    if (code && code.trim()) {
+      if (window.Toast) Toast.success('Connected successfully to Session ' + code.trim().toUpperCase());
+      this.startMonopoly('local', code.trim().toUpperCase());
+    }
+  },
+
+  toggleMonoRulebook() {
+    const s = this.monoState;
+    if (!s) return;
+    s.showRulebook = !s.showRulebook;
     this._renderMono();
   },
 
@@ -195,14 +212,12 @@ window.RelaxGames = {
     const total = s.dice[0] + s.dice[1];
     p.pos = (p.pos + total) % s.board.length;
 
-    // Pass GO
     if (p.pos < total) { p.money += 200; s.log.unshift(p.emoji + ' passed GO! +$200'); }
 
     const tile = s.board[p.pos];
     s.message = p.name + ' rolled ' + s.dice[0] + '+' + s.dice[1] + ' = ' + total + ' → landed on ' + tile.name;
     s.log.unshift(p.emoji + ' rolled ' + total + ' → ' + tile.name);
 
-    // Handle tile
     if (tile.type === 'prop') {
       const owner = s.players.find(pl => pl.owned.includes(p.pos));
       if (owner && owner !== p) {
@@ -216,12 +231,8 @@ window.RelaxGames = {
         s.turnPhase = 'action';
         s.message += '. Buy for $' + tile.price + '?';
         if (p.isCpu) {
-          // CPU auto-buys if affordable
-          if (p.money >= tile.price && Math.random() < 0.8) {
-            this.monoBuy();
-          } else {
-            this._monoEndTurn();
-          }
+          if (p.money >= tile.price && Math.random() < 0.8) this.monoBuy();
+          else this._monoEndTurn();
           return;
         }
         this._renderMono();
@@ -235,7 +246,7 @@ window.RelaxGames = {
       this._monoEndTurn();
     } else if (tile.type === 'jail') {
       p.jailed = 3;
-      p.pos = 6; // Free parking acts as jail position
+      p.pos = 6;
       s.log.unshift(p.emoji + ' sent to jail for 3 turns!');
       this._monoEndTurn();
     } else if (tile.type === 'chance') {
@@ -269,21 +280,16 @@ window.RelaxGames = {
     this._monoEndTurn();
   },
 
-  monoSkip() {
-    const s = this.monoState;
-    if (!s) return;
-    this._monoEndTurn();
-  },
+  monoSkip() { this._monoEndTurn(); },
 
   _monoEndTurn() {
     const s = this.monoState;
-    // Check bankruptcy
     const bankrupt = s.players.find(p => p.money < 0);
     if (bankrupt) {
       s.gameOver = true;
       const winner = s.players.find(p => p !== bankrupt);
       s.message = bankrupt.name + ' is bankrupt! ' + (winner ? winner.name + ' wins!' : 'Game over!');
-      if (window.XP) XP.award(20, 'Monopoly Game');
+      if (window.XP) XP.award(20, 'Monopoly Game Complete');
       this._renderMono();
       return;
     }
@@ -292,7 +298,6 @@ window.RelaxGames = {
     s.message = s.players[s.current].name + '\'s turn. Roll the dice!';
     this._renderMono();
 
-    // Auto-roll for CPU
     if (s.players[s.current].isCpu && !s.gameOver) {
       setTimeout(() => this.monoRoll(), 1500);
     }
@@ -333,15 +338,43 @@ window.RelaxGames = {
       actionsHTML = '<button class="btn btn-primary" onclick="RelaxGames.monoBuy()" style="margin-right:8px">Buy $' + tile.price + '</button><button class="btn btn-secondary" onclick="RelaxGames.monoSkip()">Skip</button>';
     }
 
-    const logHTML = s.log.slice(0, 6).map(l => '<div style="font-size:11px;opacity:0.6;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05)">' + l + '</div>').join('');
+    const logHTML = s.log.slice(0, 4).map(l => '<div style="font-size:11px;opacity:0.6;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05)">' + l + '</div>').join('');
 
-    area.innerHTML = '<div style="max-width:800px;margin:0 auto">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 class="heading-3">🏘️ MOS Monopoly</h3><button class="btn btn-secondary btn-sm" onclick="RelaxGames.showMenu()">← Back</button></div>' +
-      playersHTML + boardHTML +
-      '<div style="text-align:center;margin-bottom:12px">' + diceHTML + '</div>' +
-      '<div style="text-align:center;padding:12px;background:rgba(0,245,212,0.08);border-radius:8px;font-size:14px;font-weight:600;margin-bottom:12px">' + s.message + '</div>' +
-      '<div style="text-align:center;margin-bottom:16px">' + actionsHTML + '</div>' +
-      '<div class="glass-card" style="padding:12px"><p style="font-size:12px;font-weight:700;margin-bottom:8px">📜 Game Log</p>' + logHTML + '</div></div>';
+    area.innerHTML = `
+      <div style="max-width:850px;margin:0 auto">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div>
+            <h3 class="heading-3">🏘️ MOS Monopoly</h3>
+            <p style="font-size:11px;color:var(--accent-cyan)">🔗 Your Share Code: <b>${s.code}</b></p>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-secondary btn-sm" onclick="RelaxGames.toggleMonoRulebook()">📖 Rulebook</button>
+            <button class="btn btn-secondary btn-sm" onclick="RelaxGames.showMenu()">← Back</button>
+          </div>
+        </div>
+
+        ${s.showRulebook ? `
+          <div class="glass-card animate-fade-in" style="padding:16px;margin-bottom:16px;border-left:3px solid var(--accent-yellow)">
+            <p style="font-weight:700;color:var(--accent-yellow);margin-bottom:6px">📜 Complete Rulebook:</p>
+            <ul style="font-size:12px;opacity:0.8;line-height:1.6;margin-bottom:0;padding-left:16px">
+              <li><b>Turn Progression:</b> Players alternate rolling two dice to advance across 20 board tiles.</li>
+              <li><b>Passing GO:</b> Earn $200 each time you pass or land on the GO tile.</li>
+              <li><b>Purchasing Property:</b> Purchase any unowned property you land on for the exact price shown.</li>
+              <li><b>Collecting Rent:</b> If another player lands on your property, they pay you <b>25% of its purchase price</b>.</li>
+              <li><b>Bankruptcy:</b> If your money drops below $0, you lose instantly.</li>
+            </ul>
+            <button class="btn btn-secondary btn-sm mt-md" onclick="RelaxGames.toggleMonoRulebook()" style="padding:4px 10px;font-size:11px">I Got It, Hide Rules</button>
+          </div>
+        ` : ''}
+
+        ${playersHTML}
+        ${boardHTML}
+        <div style="text-align:center;margin-bottom:12px">${diceHTML}</div>
+        <div style="text-align:center;padding:12px;background:rgba(0,245,212,0.08);border-radius:8px;font-size:14px;font-weight:600;margin-bottom:12px">${s.message}</div>
+        <div style="text-align:center;margin-bottom:16px">${actionsHTML}</div>
+        <div class="glass-card" style="padding:12px"><p style="font-size:12px;font-weight:700;margin-bottom:8px">📜 Game Log</p>${logHTML}</div>
+      </div>
+    `;
   },
 
   // ==========================================
@@ -350,12 +383,25 @@ window.RelaxGames = {
   showMenu() {
     const area = document.getElementById('relax-game-area');
     if (!area) return;
-    area.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-lg)">' +
-      '<div class="glass-card" style="cursor:pointer;padding:30px;text-align:center;transition:all 0.2s" onclick="RelaxGames.startBurger()" onmouseover="this.style.borderColor=\'#e9c46a\'" onmouseout="this.style.borderColor=\'transparent\'">' +
-      '<div style="font-size:64px;margin-bottom:12px">🍔</div><h4 class="heading-4">Burger Builder</h4><p class="text-secondary text-sm" style="margin-top:8px">Stack burgers against the clock! Match the order perfectly for bonus points.</p><span class="badge badge-success" style="margin-top:12px">8 Orders · Free</span></div>' +
-      '<div class="glass-card" style="padding:30px;text-align:center">' +
-      '<div style="font-size:64px;margin-bottom:12px">🏘️</div><h4 class="heading-4">MOS Monopoly</h4><p class="text-secondary text-sm" style="margin-top:8px">Buy Word properties, collect rent, and bankrupt your opponent!</p>' +
-      '<div style="display:flex;gap:8px;justify-content:center;margin-top:12px"><button class="btn btn-primary btn-sm" onclick="RelaxGames.startMonopoly(\'solo\')">vs CPU 🤖</button><button class="btn btn-secondary btn-sm" onclick="RelaxGames.startMonopoly(\'local\')">2 Players 🎲</button></div></div>' +
-      '</div>';
+    area.innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-lg)">
+        <div class="glass-card" style="cursor:pointer;padding:30px;text-align:center;transition:all 0.2s" onclick="RelaxGames.startBurger()" onmouseover="this.style.borderColor='#e9c46a'" onmouseout="this.style.borderColor='transparent'">
+          <div style="font-size:64px;margin-bottom:12px">🍔</div>
+          <h4 class="heading-4">Burger Builder</h4>
+          <p class="text-secondary text-sm" style="margin-top:8px">Stack burgers against the clock! Match the order perfectly for bonus points.</p>
+          <span class="badge badge-success" style="margin-top:12px">8 Orders · Free</span>
+        </div>
+        <div class="glass-card" style="padding:30px;text-align:center">
+          <div style="font-size:64px;margin-bottom:12px">🏘️</div>
+          <h4 class="heading-4">MOS Monopoly</h4>
+          <p class="text-secondary text-sm" style="margin-top:8px">Play with a Friend or against a Smart CPU.</p>
+          <div style="display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap">
+            <button class="btn btn-primary btn-sm" onclick="RelaxGames.startMonopoly('solo')">vs CPU 🤖</button>
+            <button class="btn btn-secondary btn-sm" onclick="RelaxGames.startMonopoly('local')">Direct local 🎮</button>
+            <button class="btn btn-secondary btn-sm" onclick="RelaxGames.monoJoin()">Join Code 🔗</button>
+          </div>
+        </div>
+      </div>
+    `;
   }
 };

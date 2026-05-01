@@ -32,6 +32,7 @@ document.addEventListener('keydown', e => {
     MockExamPage.init();
     PracticeExamPage.init();
     WordLabPage.init();
+    if(window.QaForumPage) window.QaForumPage.init();
 
     // Initialize router (last, so page callbacks are registered)
     Router.init();
