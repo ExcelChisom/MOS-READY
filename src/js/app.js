@@ -39,8 +39,199 @@ document.addEventListener('keydown', e => {
     AntiCheat.init();
     BackgroundWorkers.init();
 
+    // Show onboarding tutorial on first visit
+    if (!localStorage.getItem('mos_onboarded')) {
+      setTimeout(() => Onboarding.start(), 1500);
+    }
+
     console.log('🎯 MOS-READY initialized');
   }
+
+  // ==========================================
+  // ONBOARDING TUTORIAL
+  // ==========================================
+  const Onboarding = {
+    steps: [
+      { title: 'Welcome to MOS-READY! 🎯', text: 'This app will help you master Microsoft Word and pass the MOS exam with confidence. Let me show you around!', icon: '🚀' },
+      { title: 'Dashboard 📊', text: 'Your home base! See your XP, streak, progress, and recent activity. The MOS Journey mindmap shows your path from Novice to Virtuoso.', icon: '📊', page: 'dashboard' },
+      { title: 'Learn 📚', text: 'Step-by-step lessons covering all MOS Word exam objectives. Complete modules to earn XP and build knowledge.', icon: '📚', page: 'learn' },
+      { title: 'Quizzes & Mock Exams 📝', text: 'Test your knowledge with quizzes by topic, or take a full timed Mock Exam that simulates the real test!', icon: '📝', page: 'quizzes' },
+      { title: 'Games 🎮', text: 'Learn through play! Match cards, speed quizzes, WHOT card battles, and premium brain-hacking games.', icon: '🎮', page: 'games' },
+      { title: 'Word Lab ✏️', text: 'Practice MS Word tasks in a built-in editor or with real Word. 48 hands-on tasks covering every exam area.', icon: '✏️', page: 'word-lab' },
+      { title: 'My Resources 📁', text: 'Upload study notes (PDF, DOCX, TXT, PPT), generate quizzes, create mindmaps, manage to-do lists, and get concept breakdowns.', icon: '📁', page: 'resources' },
+      { title: 'Floating Tools 🧰', text: 'The buttons on the right give you quick access to the Scientific Calculator, Study Timer, and External Playlist player.', icon: '🧰' },
+      { title: 'You\'re Ready! 💪', text: 'Start with the Guide section on your Dashboard to find your weak spots, or jump straight into Learning. Good luck!', icon: '🏆' }
+    ],
+    currentStep: 0,
+
+    start() {
+      this.currentStep = 0;
+      this._render();
+    },
+
+    _render() {
+      const step = this.steps[this.currentStep];
+      const isLast = this.currentStep === this.steps.length - 1;
+      const isFirst = this.currentStep === 0;
+
+      let overlay = document.getElementById('onboarding-overlay');
+      if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'onboarding-overlay';
+        document.body.appendChild(overlay);
+      }
+
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)';
+      overlay.innerHTML = `
+        <div style="background:linear-gradient(135deg,rgba(15,23,42,0.95),rgba(29,53,87,0.95));border:1px solid rgba(124,92,252,0.3);border-radius:20px;padding:40px;max-width:520px;width:90%;text-align:center;box-shadow:0 30px 60px rgba(0,0,0,0.5);animation:scaleIn 0.3s ease">
+          <div style="font-size:64px;margin-bottom:16px">${step.icon}</div>
+          <h2 style="font-size:22px;font-weight:800;margin-bottom:12px;color:white">${step.title}</h2>
+          <p style="font-size:15px;line-height:1.7;color:rgba(255,255,255,0.75);margin-bottom:24px">${step.text}</p>
+          <div style="display:flex;justify-content:center;gap:8px;margin-bottom:16px">
+            ${this.steps.map((_, i) => '<div style="width:8px;height:8px;border-radius:50%;background:' + (i === this.currentStep ? '#7c5cfc' : 'rgba(255,255,255,0.2)') + ';transition:background 0.3s"></div>').join('')}
+          </div>
+          <div style="display:flex;gap:12px;justify-content:center">
+            ${!isFirst ? '<button onclick="Onboarding.prev()" style="padding:10px 24px;border-radius:10px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:white;cursor:pointer;font-size:14px">← Back</button>' : ''}
+            <button onclick="Onboarding.skip()" style="padding:10px 24px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:rgba(255,255,255,0.5);cursor:pointer;font-size:13px">Skip Tutorial</button>
+            <button onclick="Onboarding.${isLast ? 'finish' : 'next'}()" style="padding:10px 30px;border-radius:10px;border:none;background:linear-gradient(135deg,#7c5cfc,#00f5d4);color:white;cursor:pointer;font-size:14px;font-weight:700">${isLast ? 'Get Started! 🚀' : 'Next →'}</button>
+          </div>
+        </div>
+      `;
+    },
+
+    next() {
+      if (this.currentStep < this.steps.length - 1) {
+        this.currentStep++;
+        const step = this.steps[this.currentStep];
+        if (step.page && window.Router) Router.navigate(step.page);
+        this._render();
+      }
+    },
+
+    prev() {
+      if (this.currentStep > 0) {
+        this.currentStep--;
+        this._render();
+      }
+    },
+
+    skip() { this.finish(); },
+
+    finish() {
+      localStorage.setItem('mos_onboarded', 'true');
+      const overlay = document.getElementById('onboarding-overlay');
+      if (overlay) overlay.remove();
+      if (window.Router) Router.navigate('dashboard');
+    }
+  };
+  window.Onboarding = Onboarding;
+
+  // ==========================================
+  // GUIDE / ASSESSMENT SYSTEM
+  // ==========================================
+  const GuideAssessment = {
+    questions: [
+      { q: 'How comfortable are you creating and saving Word documents?', area: 'Document Management', options: ['Very comfortable', 'Somewhat', 'Not sure', 'Never tried'] },
+      { q: 'Can you apply text formatting (Bold, Italic, fonts, colors)?', area: 'Text Formatting', options: ['Easily', 'With some effort', 'I struggle', 'What is that?'] },
+      { q: 'Do you know how to insert and format Tables?', area: 'Tables', options: ['Yes, including styles', 'Basic tables only', 'Not really', 'Never done it'] },
+      { q: 'Can you set up Headers, Footers, and Page Numbers?', area: 'Headers & Footers', options: ['Definitely', 'I think so', 'Not confident', 'No idea'] },
+      { q: 'How well do you know Page Layout (margins, orientation, columns)?', area: 'Page Layout', options: ['Expert level', 'I know basics', 'A little', 'Not at all'] },
+      { q: 'Can you insert and manage images, shapes, and text boxes?', area: 'Graphics & Objects', options: ['Easily', 'Somewhat', 'Barely', 'Never'] },
+      { q: 'Do you know how to use Styles and create a Table of Contents?', area: 'References & Styles', options: ['Yes!', 'Partially', 'Heard of it', 'No clue'] },
+      { q: 'How familiar are you with Mail Merge?', area: 'Mail Merge', options: ['Done it before', 'Know the concept', 'Very vague', 'Never heard of it'] },
+      { q: 'Can you use Track Changes and Comments for collaboration?', area: 'Review & Collaboration', options: ['Pro at it', 'Used it once', 'Not really', 'What?'] },
+      { q: 'How often do you use keyboard shortcuts in Word?', area: 'Efficiency & Shortcuts', options: ['All the time', 'A few', 'Rarely', 'Never'] }
+    ],
+    answers: [],
+    current: 0,
+
+    start() {
+      this.answers = [];
+      this.current = 0;
+      this._render();
+    },
+
+    _render() {
+      const container = document.getElementById('guide-assessment-area');
+      if (!container) return;
+
+      if (this.current >= this.questions.length) {
+        this._showResults(container);
+        return;
+      }
+
+      const q = this.questions[this.current];
+      container.innerHTML = `
+        <div class="glass-card" style="max-width:600px;margin:0 auto;padding:30px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+            <span style="font-size:12px;opacity:0.5">Question ${this.current + 1} of ${this.questions.length}</span>
+            <span class="badge badge-primary">${q.area}</span>
+          </div>
+          <h4 style="font-size:17px;font-weight:700;margin-bottom:20px;line-height:1.6">${q.q}</h4>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            ${q.options.map((opt, i) => `
+              <div onclick="GuideAssessment.answer(${i})" style="padding:14px 18px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;cursor:pointer;transition:all 0.2s;font-size:14px" onmouseover="this.style.borderColor='#7c5cfc';this.style.background='rgba(124,92,252,0.1)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.background='rgba(255,255,255,0.04)'">${opt}</div>
+            `).join('')}
+          </div>
+          <div style="margin-top:16px;background:rgba(255,255,255,0.05);border-radius:8px;height:6px;overflow:hidden">
+            <div style="height:100%;background:linear-gradient(90deg,#7c5cfc,#00f5d4);width:${((this.current) / this.questions.length) * 100}%;transition:width 0.3s;border-radius:8px"></div>
+          </div>
+        </div>
+      `;
+    },
+
+    answer(idx) {
+      this.answers.push({ area: this.questions[this.current].area, score: 3 - idx }); // 3=best, 0=worst
+      this.current++;
+      this._render();
+    },
+
+    _showResults(container) {
+      const weakAreas = this.answers.filter(a => a.score <= 1).map(a => a.area);
+      const strongAreas = this.answers.filter(a => a.score >= 2).map(a => a.area);
+      const overall = this.answers.reduce((sum, a) => sum + a.score, 0);
+      const maxScore = this.questions.length * 3;
+      const pct = Math.round((overall / maxScore) * 100);
+
+      let level, emoji, color;
+      if (pct >= 80) { level = 'Advanced'; emoji = '🏆'; color = '#00f5d4'; }
+      else if (pct >= 50) { level = 'Intermediate'; emoji = '📈'; color = '#fee440'; }
+      else { level = 'Beginner'; emoji = '🌱'; color = '#f72585'; }
+
+      localStorage.setItem('mos_guide_results', JSON.stringify({ weakAreas, strongAreas, pct, level }));
+
+      container.innerHTML = `
+        <div class="glass-card" style="max-width:600px;margin:0 auto;padding:30px;text-align:center">
+          <div style="font-size:64px;margin-bottom:12px">${emoji}</div>
+          <h3 style="font-size:22px;font-weight:800;margin-bottom:8px">Your Level: <span style="color:${color}">${level}</span></h3>
+          <p style="font-size:14px;opacity:0.6;margin-bottom:20px">Overall score: ${pct}%</p>
+          ${weakAreas.length > 0 ? `
+            <div style="text-align:left;margin-bottom:20px">
+              <h4 style="color:#f72585;font-size:14px;margin-bottom:10px">⚠️ Areas to Improve:</h4>
+              <div style="display:flex;flex-wrap:wrap;gap:8px">
+                ${weakAreas.map(a => '<span style="background:rgba(247,37,133,0.15);border:1px solid rgba(247,37,133,0.3);padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600">' + a + '</span>').join('')}
+              </div>
+            </div>
+          ` : ''}
+          ${strongAreas.length > 0 ? `
+            <div style="text-align:left;margin-bottom:20px">
+              <h4 style="color:#00f5d4;font-size:14px;margin-bottom:10px">💪 Your Strengths:</h4>
+              <div style="display:flex;flex-wrap:wrap;gap:8px">
+                ${strongAreas.map(a => '<span style="background:rgba(0,245,212,0.1);border:1px solid rgba(0,245,212,0.3);padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600">' + a + '</span>').join('')}
+              </div>
+            </div>
+          ` : ''}
+          <div style="display:flex;gap:10px;justify-content:center;margin-top:20px">
+            <button class="btn btn-primary" onclick="Router.navigate('learn')">📚 Start Learning</button>
+            <button class="btn btn-secondary" onclick="GuideAssessment.start()">🔄 Retake</button>
+          </div>
+        </div>
+      `;
+
+      if (window.XP) XP.award(15, 'Completed Guide Assessment');
+    }
+  };
+  window.GuideAssessment = GuideAssessment;
 
   const BackgroundWorkers = {
     init() {

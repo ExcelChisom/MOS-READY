@@ -134,6 +134,15 @@ const GamesPage = {
           <div class="game-card__xp">⚡ Up to +140 XP • 👑 PREMIUM</div>
         </div>
       </div>
+
+      <div class="game-card" onclick="GamesPage.startWhotGame()">
+        <div class="game-card__banner" style="background:linear-gradient(135deg, #2d6a4f 0%, #40916c 50%, #fee440 100%)">🃏</div>
+        <div class="game-card__body">
+          <div class="game-card__title">MOS WHOT! Cards</div>
+          <div class="game-card__desc">Play WHOT-style cards vs CPU! Answer MOS questions with the correct card to score points. Includes Pick 2, Suspension & Hold On penalties!</div>
+          <div class="game-card__xp">⚡ Up to +80 XP • FREE</div>
+        </div>
+      </div>
     `;
   },
 
@@ -591,6 +600,292 @@ const GamesPage = {
        console.error("Cat Speak failed:", err);
        Toast.error("Failed to generate voice.");
      }
+  },
+
+  // ===== WHOT CARD GAME (User vs CPU) =====
+  whotState: null,
+
+  startWhotGame() {
+    document.getElementById('games-list').style.display = 'none';
+    const header = document.querySelector('#page-games .page__header');
+    if (header) header.style.display = 'none';
+    document.getElementById('game-area').style.display = 'block';
+
+    const allQs = Object.values(QUESTION_BANK).flat();
+    const questions = [...allQs].sort(() => Math.random() - 0.5).slice(0, 20);
+
+    // Create deck: each question becomes 4 cards (1 correct + 3 wrong)
+    const deck = [];
+    const shapes = ['⭐', '🔺', '⬟', '✚', '🔵'];
+    questions.forEach((q, qi) => {
+      q.options.forEach((opt, oi) => {
+        deck.push({
+          id: qi * 4 + oi,
+          text: opt.length > 35 ? opt.substring(0, 33) + '..' : opt,
+          isCorrect: oi === q.correct,
+          questionIdx: qi,
+          shape: shapes[qi % shapes.length],
+          color: ['#e63946', '#2a9d8f', '#e9c46a', '#264653'][oi],
+          special: null
+        });
+      });
+    });
+
+    // Add special cards
+    const specials = [
+      { text: 'PICK 2', special: 'pick2', shape: '⭐', color: '#f72585' },
+      { text: 'PICK 2', special: 'pick2', shape: '🔺', color: '#f72585' },
+      { text: 'SUSPENSION', special: 'suspend', shape: '⬟', color: '#7c5cfc' },
+      { text: 'HOLD ON', special: 'holdon', shape: '✚', color: '#00f5d4' },
+      { text: 'GENERAL MARKET', special: 'market', shape: '🔵', color: '#ff6b35' },
+    ];
+    specials.forEach((s, i) => {
+      deck.push({ id: 1000 + i, ...s, isCorrect: false, questionIdx: -1 });
+    });
+
+    // Shuffle and deal
+    const shuffled = deck.sort(() => Math.random() - 0.5);
+    const playerHand = shuffled.splice(0, 7);
+    const cpuHand = shuffled.splice(0, 7);
+    const drawPile = shuffled;
+
+    this.whotState = {
+      questions,
+      currentQ: 0,
+      playerHand,
+      cpuHand,
+      drawPile,
+      playerScore: 0,
+      cpuScore: 0,
+      turn: 'player', // 'player' or 'cpu'
+      message: 'Your turn! Play a card with the correct answer.',
+      gameOver: false,
+      round: 1
+    };
+
+    this._renderWhot();
+  },
+
+  _renderWhot() {
+    const s = this.whotState;
+    if (!s) return;
+    const area = document.getElementById('game-area');
+    const q = s.questions[s.currentQ % s.questions.length];
+
+    area.innerHTML = `
+      <div class="animate-fade-in" style="max-width:900px;margin:0 auto">
+        <div class="lesson-breadcrumb" onclick="GamesPage.renderGamesList()" style="cursor:pointer;margin-bottom:var(--space-md)">← Back to Games</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-md)">
+          <h3 class="heading-3">🃏 MOS WHOT!</h3>
+          <div style="display:flex;gap:var(--space-sm)">
+            <span class="badge badge-success">You: ${s.playerScore}</span>
+            <span class="badge badge-warning">CPU: ${s.cpuScore}</span>
+            <span class="badge badge-primary">Round ${s.round}</span>
+          </div>
+        </div>
+
+        <!-- Question -->
+        <div class="glass-card" style="margin-bottom:var(--space-md);padding:16px;border-left:3px solid var(--accent-cyan)">
+          <p style="font-size:11px;opacity:0.5;margin-bottom:6px">CURRENT QUESTION:</p>
+          <p style="font-weight:600;font-size:15px;line-height:1.6">${q.question}</p>
+        </div>
+
+        <!-- Status -->
+        <div style="text-align:center;margin-bottom:var(--space-md);padding:10px;background:rgba(${s.turn === 'player' ? '0,245,212' : '247,37,133'},0.1);border-radius:8px;font-size:13px;font-weight:600;color:${s.turn === 'player' ? '#00f5d4' : '#f72585'}">
+          ${s.message}
+        </div>
+
+        <!-- CPU hand (face down) -->
+        <div style="margin-bottom:var(--space-md)">
+          <p style="font-size:12px;opacity:0.5;margin-bottom:8px">CPU's cards (${s.cpuHand.length})</p>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            ${s.cpuHand.map(() => '<div style="width:50px;height:70px;background:linear-gradient(135deg,#1d3557,#264653);border-radius:8px;border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:18px">🂠</div>').join('')}
+          </div>
+        </div>
+
+        <!-- Draw pile -->
+        <div style="text-align:center;margin-bottom:var(--space-md)">
+          <button class="btn btn-secondary" onclick="GamesPage._whotDraw()" ${s.turn !== 'player' || s.gameOver ? 'disabled' : ''} style="padding:8px 20px;font-size:13px">📥 Draw Card (${s.drawPile.length} left)</button>
+        </div>
+
+        <!-- Player hand -->
+        <div>
+          <p style="font-size:12px;opacity:0.5;margin-bottom:8px">Your cards (${s.playerHand.length})</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            ${s.playerHand.map((card, i) => `
+              <div onclick="GamesPage._whotPlayCard(${i})" style="width:90px;height:120px;background:linear-gradient(135deg,${card.color}22,${card.color}44);border:2px solid ${card.color};border-radius:10px;cursor:${s.turn === 'player' && !s.gameOver ? 'pointer' : 'default'};transition:all 0.2s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:6px;${s.turn === 'player' && !s.gameOver ? 'transform:translateY(0)' : 'opacity:0.5'}" onmouseover="if('${s.turn}'==='player')this.style.transform='translateY(-8px) scale(1.05)'" onmouseout="this.style.transform='translateY(0) scale(1)'">
+                <span style="font-size:20px">${card.shape}</span>
+                <span style="font-size:9px;text-align:center;font-weight:600;color:white;line-height:1.2;overflow:hidden;max-height:48px">${card.text}</span>
+                ${card.special ? '<span style="font-size:8px;background:rgba(255,255,255,0.2);padding:2px 6px;border-radius:10px;margin-top:2px">' + card.special.toUpperCase() + '</span>' : ''}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        ${s.gameOver ? `
+          <div style="text-align:center;margin-top:var(--space-xl);padding:30px" class="animate-scale-in">
+            <div style="font-size:64px;margin-bottom:var(--space-md)">${s.playerScore > s.cpuScore ? '🏆' : s.playerScore === s.cpuScore ? '🤝' : '😤'}</div>
+            <h3 class="heading-3">${s.playerScore > s.cpuScore ? 'You Win!' : s.playerScore === s.cpuScore ? 'Draw!' : 'CPU Wins!'}</h3>
+            <p class="text-secondary" style="margin:10px 0">You: ${s.playerScore} pts · CPU: ${s.cpuScore} pts</p>
+            <div style="display:flex;gap:var(--space-md);justify-content:center;margin-top:var(--space-lg)">
+              <button class="btn btn-primary" onclick="GamesPage.startWhotGame()">Play Again 🔄</button>
+              <button class="btn btn-secondary" onclick="GamesPage.renderGamesList()">Back to Games</button>
+            </div>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  },
+
+  _whotPlayCard(index) {
+    const s = this.whotState;
+    if (!s || s.turn !== 'player' || s.gameOver) return;
+
+    const card = s.playerHand[index];
+
+    // Special cards
+    if (card.special) {
+      s.playerHand.splice(index, 1);
+      this._applySpecial(card.special, 'player');
+      this._advanceTurn();
+      return;
+    }
+
+    // Answer card
+    if (card.isCorrect) {
+      s.playerScore++;
+      s.playerHand.splice(index, 1);
+      s.message = '✅ Correct! +1 point. CPU\'s turn...';
+      if (window.Toast) Toast.success('✅ Correct answer!');
+      s.currentQ++;
+      s.round++;
+    } else {
+      s.playerHand.splice(index, 1);
+      s.message = '❌ Wrong answer! No points. CPU\'s turn...';
+      if (window.Toast) Toast.error('❌ Wrong! That wasn\'t the right answer.');
+    }
+
+    this._advanceTurn();
+  },
+
+  _whotDraw() {
+    const s = this.whotState;
+    if (!s || s.turn !== 'player' || s.gameOver) return;
+
+    if (s.drawPile.length === 0) {
+      if (window.Toast) Toast.warning('No cards left to draw!');
+      return;
+    }
+
+    s.playerHand.push(s.drawPile.pop());
+    s.message = 'Drew a card. CPU\'s turn...';
+    this._advanceTurn();
+  },
+
+  _advanceTurn() {
+    const s = this.whotState;
+
+    // Check game over
+    if (s.playerHand.length === 0 || s.cpuHand.length === 0 || s.round > 15) {
+      s.gameOver = true;
+      s.message = 'Game Over!';
+      const xp = Math.max(10, s.playerScore * 10);
+      if (s.playerScore > s.cpuScore) {
+        XP.award(xp, 'Won MOS WHOT!');
+        Confetti.burst();
+      } else {
+        XP.award(Math.floor(xp / 2), 'Played MOS WHOT');
+      }
+      Storage.addActivity({ type: 'game', text: `MOS WHOT: You ${s.playerScore} - CPU ${s.cpuScore}` });
+      this._renderWhot();
+      return;
+    }
+
+    if (s.turn === 'player') {
+      s.turn = 'cpu';
+      this._renderWhot();
+      // CPU plays after delay
+      setTimeout(() => this._cpuPlay(), 1200);
+    } else {
+      s.turn = 'player';
+      s.message = 'Your turn! Play a card with the correct answer.';
+      this._renderWhot();
+    }
+  },
+
+  _cpuPlay() {
+    const s = this.whotState;
+    if (!s || s.gameOver) return;
+
+    const q = s.questions[s.currentQ % s.questions.length];
+
+    // CPU tries to find the correct answer card (70% chance of playing correctly)
+    const correctCard = s.cpuHand.findIndex(c => c.isCorrect && c.questionIdx === s.currentQ % s.questions.length);
+    const specialCard = s.cpuHand.findIndex(c => c.special);
+    const isClever = Math.random() < 0.7;
+
+    if (correctCard >= 0 && isClever) {
+      // CPU plays correct answer
+      s.cpuHand.splice(correctCard, 1);
+      s.cpuScore++;
+      s.message = '🤖 CPU played the correct answer! +1 for CPU.';
+      s.currentQ++;
+      s.round++;
+    } else if (specialCard >= 0 && Math.random() < 0.4) {
+      // CPU plays special card
+      const card = s.cpuHand.splice(specialCard, 1)[0];
+      this._applySpecial(card.special, 'cpu');
+    } else if (s.cpuHand.length > 0) {
+      // CPU plays random card (likely wrong)
+      const idx = Math.floor(Math.random() * s.cpuHand.length);
+      const card = s.cpuHand.splice(idx, 1)[0];
+      if (card.special) {
+        this._applySpecial(card.special, 'cpu');
+      } else if (card.isCorrect) {
+        s.cpuScore++;
+        s.message = '🤖 CPU got lucky with a correct answer!';
+        s.currentQ++;
+        s.round++;
+      } else {
+        s.message = '🤖 CPU played a wrong card. No points for CPU.';
+        s.currentQ++;
+        s.round++;
+      }
+    } else {
+      // CPU draws
+      if (s.drawPile.length > 0) s.cpuHand.push(s.drawPile.pop());
+      s.message = '🤖 CPU drew a card.';
+    }
+
+    s.turn = 'player';
+    this._advanceTurn();
+  },
+
+  _applySpecial(type, playedBy) {
+    const s = this.whotState;
+    const target = playedBy === 'player' ? 'cpu' : 'player';
+    const targetHand = target === 'player' ? s.playerHand : s.cpuHand;
+
+    switch (type) {
+      case 'pick2':
+        for (let i = 0; i < 2 && s.drawPile.length > 0; i++) targetHand.push(s.drawPile.pop());
+        s.message = `${playedBy === 'player' ? 'You' : '🤖 CPU'} played PICK 2! ${target === 'player' ? 'You pick' : 'CPU picks'} 2 cards.`;
+        break;
+      case 'suspend':
+        s.message = `${playedBy === 'player' ? 'You' : '🤖 CPU'} played SUSPENSION! ${target === 'player' ? 'You lose' : 'CPU loses'} a turn.`;
+        // Skip the opponent's next turn by not changing turn
+        break;
+      case 'holdon':
+        s.message = `${playedBy === 'player' ? 'You' : '🤖 CPU'} played HOLD ON! Gets another turn.`;
+        break;
+      case 'market':
+        for (let i = 0; i < 1 && s.drawPile.length > 0; i++) {
+          s.playerHand.push(s.drawPile.pop());
+          if (s.drawPile.length > 0) s.cpuHand.push(s.drawPile.pop());
+        }
+        s.message = 'GENERAL MARKET! Everyone draws a card.';
+        break;
+    }
   }
 };
 

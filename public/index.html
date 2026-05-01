@@ -220,6 +220,57 @@
             </div>
           </div>
         </div>
+
+        <!-- MOS JOURNEY MINDMAP -->
+        <div class="glass-card" style="margin-top:var(--space-xl);padding:24px">
+          <h3 class="heading-3 mb-md">🗺️ MOS Journey: Novice → Virtuoso</h3>
+          <p class="text-secondary text-sm mb-md">Your progression path through the MOS Word certification</p>
+          <div style="display:flex;align-items:center;gap:0;overflow-x:auto;padding:20px 0">
+            <div style="text-align:center;min-width:120px">
+              <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#264653,#2a9d8f);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 8px">🌱</div>
+              <div style="font-weight:700;font-size:13px">Novice</div>
+              <div style="font-size:10px;opacity:0.5">0 XP</div>
+            </div>
+            <div style="flex:1;height:3px;background:linear-gradient(90deg,#2a9d8f,#e9c46a);min-width:40px;border-radius:2px"></div>
+            <div style="text-align:center;min-width:120px">
+              <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#e9c46a,#f4a261);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 8px">📖</div>
+              <div style="font-weight:700;font-size:13px">Learner</div>
+              <div style="font-size:10px;opacity:0.5">100 XP</div>
+            </div>
+            <div style="flex:1;height:3px;background:linear-gradient(90deg,#f4a261,#e76f51);min-width:40px;border-radius:2px"></div>
+            <div style="text-align:center;min-width:120px">
+              <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#e76f51,#f72585);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 8px">⚡</div>
+              <div style="font-weight:700;font-size:13px">Practitioner</div>
+              <div style="font-size:10px;opacity:0.5">300 XP</div>
+            </div>
+            <div style="flex:1;height:3px;background:linear-gradient(90deg,#f72585,#7c5cfc);min-width:40px;border-radius:2px"></div>
+            <div style="text-align:center;min-width:120px">
+              <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#7c5cfc,#b5179e);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 8px">🧠</div>
+              <div style="font-weight:700;font-size:13px">Expert</div>
+              <div style="font-size:10px;opacity:0.5">600 XP</div>
+            </div>
+            <div style="flex:1;height:3px;background:linear-gradient(90deg,#b5179e,#00f5d4);min-width:40px;border-radius:2px"></div>
+            <div style="text-align:center;min-width:120px">
+              <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#00f5d4,#fee440);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 8px;box-shadow:0 0 20px rgba(0,245,212,0.4)">🏆</div>
+              <div style="font-weight:700;font-size:13px;background:linear-gradient(90deg,#00f5d4,#fee440);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Virtuoso</div>
+              <div style="font-size:10px;opacity:0.5">1000+ XP</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- GUIDE / ASSESSMENT SECTION -->
+        <div style="margin-top:var(--space-xl)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-md)">
+            <div>
+              <h3 class="heading-3">🧭 Find Your Starting Point</h3>
+              <p class="text-secondary text-sm">Answer a few questions to identify your weak areas and get a personalized study plan.</p>
+            </div>
+            <button class="btn btn-primary" onclick="if(window.GuideAssessment) GuideAssessment.start()">Start Assessment</button>
+          </div>
+          <div id="guide-assessment-area">
+            <!-- Assessment renders here -->
+          </div>
+        </div>
       </div>
 
       <!-- LEARN PAGE -->
@@ -611,18 +662,17 @@
           <div style="font-size: 64px">📁</div>
           <div>
             <h2 class="heading-1" style="color:white; margin:0">My Resources & AI Hub</h2>
-            <p style="opacity:0.8; font-size:16px">Upload notes, generate questions, create mindmaps, and explain concepts.</p>
+            <p style="opacity:0.8; font-size:16px">Upload notes, generate questions, create mindmaps, manage tasks, and get concept breakdowns.</p>
           </div>
         </div>
 
-        <!-- TOP ROW: Upload + Notes Manager -->
+        <!-- ROW 1: Upload + Notes Manager -->
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg); margin-top: var(--space-lg)">
-          
-          <!-- File Uploader & GenAI -->
+          <!-- File Uploader -->
           <div class="glass-card">
             <h3 class="heading-3 mb-md">📤 Upload & Generate</h3>
-            <p class="text-secondary text-sm mb-md">Upload lecture notes to auto-generate MOS-style exam questions. Supports <b>.txt, .md, .docx, .rtf, .pdf, .doc</b> files.</p>
-            <input type="file" id="resource-file-upload" accept=".txt,.md,.docx,.rtf,.pdf,.doc,.csv"
+            <p class="text-secondary text-sm mb-md">Upload your study materials to auto-generate quiz questions & concept breakdowns. Supports <b>.txt, .md, .docx, .rtf, .pdf, .doc, .ppt, .pptx</b></p>
+            <input type="file" id="resource-file-upload" accept=".txt,.md,.docx,.rtf,.pdf,.doc,.csv,.ppt,.pptx"
               style="width:100%; padding:10px; border-radius:8px; background:rgba(0,0,0,0.3); color:white; margin-bottom:15px; border:1px dashed var(--accent-cyan)">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px">
               <label class="text-sm">Questions to generate:</label>
@@ -636,12 +686,9 @@
           <div class="glass-card">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: var(--space-md)">
               <h3 class="heading-3" style="margin:0">📝 My Notes</h3>
-              <button class="btn btn-secondary" onclick="if(window.Resources) Resources.createNote()" 
-                style="padding:6px 14px; font-size:13px">+ New Note</button>
+              <button class="btn btn-secondary" onclick="if(window.Resources) Resources.createNote()" style="padding:6px 14px; font-size:13px">+ New Note</button>
             </div>
-            <div id="resource-notes-list" style="max-height:220px; overflow-y:auto; padding-right:5px">
-              <!-- Populated by JS -->
-            </div>
+            <div id="resource-notes-list" style="max-height:220px; overflow-y:auto; padding-right:5px"></div>
           </div>
         </div>
 
@@ -649,8 +696,9 @@
         <div class="glass-card" style="margin-top: var(--space-lg)">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: var(--space-md)">
             <h3 class="heading-3" style="margin:0">✏️ <span id="resource-note-title">No note selected</span></h3>
-            <div style="display:flex; gap:8px">
-              <button class="btn btn-secondary" onclick="if(window.Resources) Resources.generateMindmap()" style="padding:6px 14px; font-size:13px">🧠 Generate Mindmap</button>
+            <div style="display:flex; gap:8px; flex-wrap:wrap">
+              <button class="btn btn-secondary" onclick="if(window.Resources) Resources.generateMindmap()" style="padding:6px 14px; font-size:13px">🧠 Mindmap</button>
+              <button class="btn btn-secondary" onclick="var t=document.getElementById('resource-notes');if(t&&t.value){window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t.value);u.rate=1;window.speechSynthesis.speak(u);if(window.Toast)Toast.info('🔊 Reading aloud...')}" style="padding:6px 14px; font-size:13px">🔊 Read Aloud</button>
               <button class="btn btn-primary" onclick="if(window.Resources) Resources.saveNotes()" style="padding:6px 14px; font-size:13px">💾 Save</button>
             </div>
           </div>
@@ -658,11 +706,22 @@
             style="width:100%; height:200px; background:#0b1120; border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:white; padding:15px; font-family:inherit; resize:vertical; line-height:1.7; font-size:14px"></textarea>
         </div>
 
+        <!-- TO-DO / Study Planner -->
+        <div class="glass-card" style="margin-top: var(--space-lg)">
+          <h3 class="heading-3 mb-md">✅ Study Planner / To-Do</h3>
+          <div style="display:flex; gap:8px; margin-bottom:var(--space-md)">
+            <input type="text" id="todo-input" placeholder="Add a study task..." onkeydown="if(event.key==='Enter'){Resources.addTodo()}"
+              style="flex:1; padding:10px 14px; background:#0b1120; border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:white; font-family:inherit; font-size:14px">
+            <button class="btn btn-primary" onclick="if(window.Resources) Resources.addTodo()" style="padding:10px 18px">Add</button>
+          </div>
+          <div id="todo-list" style="max-height:250px; overflow-y:auto"></div>
+        </div>
+
         <!-- Mindmap Area -->
         <div id="resource-mindmap-area" style="display:none; margin-top:var(--space-lg)">
           <div class="glass-card">
             <h3 class="heading-3 mb-md">🧠 Visual Mindmap</h3>
-            <p class="text-secondary text-sm mb-md">Auto-generated from your notes. MOS concepts are highlighted as branches.</p>
+            <p class="text-secondary text-sm mb-md">Auto-generated from your content. Key concepts are visualized as branches.</p>
             <div class="mindmap-canvas-wrap" style="border-radius:12px; overflow:hidden; border:1px solid rgba(124,92,252,0.2)">
               <canvas id="mindmap-canvas" style="width:100%; height:500px; display:block; background:#0a0a1a"></canvas>
             </div>
@@ -673,22 +732,21 @@
         <div id="resource-output-area" style="display:none; margin-top:var(--space-xl)">
           <h3 class="heading-2 mb-md">🤖 AI Analysis Output</h3>
           <div style="display:grid; grid-template-columns: 2fr 1fr; gap: var(--space-lg)">
-            <!-- Explanations & Questions -->
             <div>
               <div class="glass-card mb-md" id="resource-explanation-box">
-                <h4 class="heading-4 text-gradient">Concept Breakdown</h4>
+                <h4 class="heading-4 text-gradient">📖 Concept Breakdown</h4>
                 <div id="resource-explanation-content" class="text-secondary text-sm" style="line-height:1.6; margin-top:10px"></div>
               </div>
               <div class="glass-card" id="resource-questions-box">
-                <h4 class="heading-4 text-gradient">Generated Practice Quiz</h4>
+                <h4 class="heading-4 text-gradient">📝 Generated Practice Quiz</h4>
+                <p class="text-xs text-secondary mb-sm">Click an option to check your answer (green = correct, red = wrong)</p>
                 <div id="resource-questions-content" style="margin-top:15px"></div>
               </div>
             </div>
-            <!-- YouTube References -->
             <div>
               <div class="glass-card" style="position:sticky; top:20px">
-                <h4 class="heading-4 mb-md">📺 YouTube References</h4>
-                <p class="text-secondary text-xs mb-md">Based on your upload, search for visual tutorials.</p>
+                <h4 class="heading-4 mb-md">📺 Video Tutorials</h4>
+                <p class="text-secondary text-xs mb-md">Related video tutorials embedded directly.</p>
                 <div id="resource-youtube-links" style="display:flex; flex-direction:column; gap:10px"></div>
               </div>
             </div>
@@ -730,72 +788,98 @@
     <button onclick="window.AppTools && window.AppTools.toggleTimer()" class="btn btn-secondary"
       style="border-radius:50%; width:50px; height:50px; padding:0; display:flex; justify-content:center; align-items:center; font-size:24px; box-shadow:0 4px 15px rgba(0,0,0,0.3); background:var(--gradient-warm); border:none;"
       title="Study Timer">⏱️</button>
+    <button onclick="window.AppTools && window.AppTools.togglePlaylist()" class="btn btn-secondary"
+      style="border-radius:50%; width:50px; height:50px; padding:0; display:flex; justify-content:center; align-items:center; font-size:24px; box-shadow:0 4px 15px rgba(0,0,0,0.3); background:linear-gradient(135deg,#00f5d4,#0077b6); border:none;"
+      title="External Playlist">🎶</button>
   </div>
 
-  <!-- CALCULATOR PANEL -->
+  <!-- SCIENTIFIC CALCULATOR -->
   <div id="calc-panel" class="glass-card"
-    style="display:none; position:fixed; top:140px; right:80px; z-index:10000; width:320px; box-shadow:0 10px 40px rgba(0,0,0,0.5); padding:15px">
+    style="display:none; position:fixed; top:80px; right:80px; z-index:10000; width:360px; box-shadow:0 10px 40px rgba(0,0,0,0.6); padding:16px; border:1px solid rgba(124,92,252,0.3)">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-      <h4 style="margin:0;color:var(--accent-cyan)">Scientific Calculator</h4>
-      <button onclick="window.AppTools.toggleCalc()"
-        style="background:none;border:none;color:white;cursor:pointer">✖</button>
+      <h4 style="margin:0;color:var(--accent-cyan)">🔢 Scientific Calculator</h4>
+      <button onclick="AppTools.toggleCalc()" style="background:none;border:none;color:white;cursor:pointer;font-size:18px">✖</button>
     </div>
-    <div id="calc-display"
-      style="width:100%; height:50px; background:#0b1120; border-radius:8px; margin-bottom:10px; color:white; font-size:24px; text-align:right; padding:10px; font-family:monospace; overflow:hidden">
-      0</div>
-    <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px">
-      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('sin')">sin</button>
-      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('cos')">cos</button>
-      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('tan')">tan</button>
-      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('clear')"
-        style="background:#e63946">C</button>
-
-      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('log')">log</button>
-      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('sqrt')">√</button>
-      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('^')">^</button>
-      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('/')" style="background:#fca311">/</button>
-
+    <div id="calc-preview" style="width:100%;height:18px;font-size:11px;color:rgba(255,255,255,0.4);text-align:right;padding:0 10px;font-family:monospace;overflow:hidden"></div>
+    <div id="calc-display" style="width:100%;height:50px;background:#0b1120;border-radius:8px;margin-bottom:10px;color:white;font-size:24px;text-align:right;padding:10px;font-family:monospace;overflow:hidden;border:1px solid rgba(255,255,255,0.1)">0</div>
+    <!-- Scientific row -->
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:6px">
+      <button class="btn btn-secondary btn-sm" style="font-size:11px;padding:6px 2px" onclick="AppTools.calcInput('sin(')">sin</button>
+      <button class="btn btn-secondary btn-sm" style="font-size:11px;padding:6px 2px" onclick="AppTools.calcInput('cos(')">cos</button>
+      <button class="btn btn-secondary btn-sm" style="font-size:11px;padding:6px 2px" onclick="AppTools.calcInput('tan(')">tan</button>
+      <button class="btn btn-secondary btn-sm" style="font-size:11px;padding:6px 2px" onclick="AppTools.calcInput('log(')">log</button>
+      <button class="btn btn-secondary btn-sm" style="font-size:11px;padding:6px 2px" onclick="AppTools.calcInput('ln(')">ln</button>
+      <button class="btn btn-secondary btn-sm" style="font-size:11px;padding:6px 2px" onclick="AppTools.calcInput('asin(')">sin⁻¹</button>
+      <button class="btn btn-secondary btn-sm" style="font-size:11px;padding:6px 2px" onclick="AppTools.calcInput('acos(')">cos⁻¹</button>
+      <button class="btn btn-secondary btn-sm" style="font-size:11px;padding:6px 2px" onclick="AppTools.calcInput('atan(')">tan⁻¹</button>
+      <button class="btn btn-secondary btn-sm" style="font-size:11px;padding:6px 2px" onclick="AppTools.calcInput('sqrt(')">√</button>
+      <button class="btn btn-secondary btn-sm" style="font-size:11px;padding:6px 2px" onclick="AppTools.calcInput('cbrt(')">∛</button>
+      <button class="btn btn-secondary btn-sm" style="font-size:11px;padding:6px 2px" onclick="AppTools.calcInput('PI')">π</button>
+      <button class="btn btn-secondary btn-sm" style="font-size:11px;padding:6px 2px" onclick="AppTools.calcInput('E')">e</button>
+      <button class="btn btn-secondary btn-sm" style="font-size:11px;padding:6px 2px" onclick="AppTools.calcInput('^')">xⁿ</button>
+      <button class="btn btn-secondary btn-sm" style="font-size:11px;padding:6px 2px" onclick="AppTools.calcInput('x2')">x²</button>
+      <button class="btn btn-secondary btn-sm" style="font-size:11px;padding:6px 2px" onclick="AppTools.calcInput('!')">n!</button>
+    </div>
+    <!-- Main keypad -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('1/x')" style="font-size:12px">1/x</button>
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('(')">(</button>
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput(')')">)</button>
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('C')" style="background:#e63946;color:white">C</button>
       <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('7')">7</button>
       <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('8')">8</button>
       <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('9')">9</button>
-      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('*')" style="background:#fca311">×</button>
-
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('/')" style="background:rgba(252,163,17,0.3);color:#fca311">÷</button>
       <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('4')">4</button>
       <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('5')">5</button>
       <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('6')">6</button>
-      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('-')" style="background:#fca311">-</button>
-
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('*')" style="background:rgba(252,163,17,0.3);color:#fca311">×</button>
       <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('1')">1</button>
       <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('2')">2</button>
       <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('3')">3</button>
-      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('+')" style="background:#fca311">+</button>
-
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('-')" style="background:rgba(252,163,17,0.3);color:#fca311">−</button>
       <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('0')">0</button>
       <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('.')">.</button>
-      <button class="btn btn-primary btn-sm" onclick="AppTools.calcInput('=')" style="grid-column: span 2">=</button>
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('DEL')">⌫</button>
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('+')" style="background:rgba(252,163,17,0.3);color:#fca311">+</button>
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('+/-')">±</button>
+      <button class="btn btn-secondary btn-sm" onclick="AppTools.calcInput('%')">%</button>
+      <button class="btn btn-primary btn-sm" onclick="AppTools.calcInput('=')" style="grid-column:span 2;font-size:18px">=</button>
     </div>
   </div>
 
   <!-- TIMER PANEL -->
   <div id="timer-panel" class="glass-card"
-    style="display:none; position:fixed; top:200px; right:80px; z-index:10000; width:260px; text-align:center; padding:20px; box-shadow:0 10px 40px rgba(0,0,0,0.5)">
+    style="display:none; position:fixed; top:200px; right:80px; z-index:10000; width:260px; text-align:center; padding:20px; box-shadow:0 10px 40px rgba(0,0,0,0.5); border:1px solid rgba(254,228,64,0.2)">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px">
-      <h4 style="margin:0;color:var(--accent-yellow)">Study Timer</h4>
-      <button onclick="window.AppTools.toggleTimer()"
-        style="background:none;border:none;color:white;cursor:pointer">✖</button>
+      <h4 style="margin:0;color:var(--accent-yellow)">⏱️ Study Timer</h4>
+      <button onclick="AppTools.toggleTimer()" style="background:none;border:none;color:white;cursor:pointer;font-size:18px">✖</button>
     </div>
-    <div id="timer-display"
-      style="font-size:48px; font-weight:900; font-family:monospace; margin-bottom:15px; color:white; text-shadow:0 0 10px rgba(255,255,255,0.3)">
-      25:00</div>
-    <div style="display:flex; gap:10px; margin-bottom:15px">
+    <div id="timer-display" style="font-size:48px;font-weight:900;font-family:monospace;margin-bottom:15px;color:white;text-shadow:0 0 10px rgba(255,255,255,0.3)">25:00</div>
+    <div style="display:flex;gap:10px;margin-bottom:15px">
       <input type="number" id="timer-minutes" value="25" min="1" max="120"
-        style="width:100%; padding:8px; text-align:center; border-radius:5px; background:rgba(0,0,0,0.2); color:white; border:1px solid rgba(255,255,255,0.2)">
+        style="width:100%;padding:8px;text-align:center;border-radius:5px;background:rgba(0,0,0,0.2);color:white;border:1px solid rgba(255,255,255,0.2)">
       <span style="display:flex;align-items:center">min</span>
     </div>
-    <div style="display:flex; gap:10px">
+    <div style="display:flex;gap:10px">
       <button class="btn btn-primary w-full" id="timer-start-btn" onclick="AppTools.startTimer()">Start</button>
       <button class="btn btn-secondary w-full" onclick="AppTools.resetTimer()" style="background:#e63946">Reset</button>
     </div>
+  </div>
+
+  <!-- PLAYLIST PANEL -->
+  <div id="playlist-panel" class="glass-card"
+    style="display:none; position:fixed; bottom:80px; right:80px; z-index:10000; width:360px; padding:16px; box-shadow:0 10px 40px rgba(0,0,0,0.5); border:1px solid rgba(0,245,212,0.2)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <h4 style="margin:0;color:var(--accent-cyan)">🎶 External Playlist</h4>
+      <button onclick="AppTools.togglePlaylist()" style="background:none;border:none;color:white;cursor:pointer;font-size:18px">✖</button>
+    </div>
+    <p style="font-size:11px;color:#f72585;margin-bottom:10px;padding:8px;background:rgba(247,37,133,0.1);border-radius:6px;border-left:3px solid #f72585">⚠️ External music may distract from real exam conditions. The built-in Focus Music simulates actual test-center ambiance for better preparation.</p>
+    <input type="text" id="playlist-url" placeholder="Paste YouTube, Spotify, or SoundCloud URL..."
+      style="width:100%;padding:10px;border-radius:8px;background:#0b1120;color:white;border:1px solid rgba(255,255,255,0.1);margin-bottom:10px;font-size:13px"
+      onkeydown="if(event.key==='Enter')AppTools.loadPlaylist()">
+    <button class="btn btn-primary w-full" onclick="AppTools.loadPlaylist()" style="margin-bottom:10px">▶️ Load & Play</button>
+    <div id="playlist-player"></div>
   </div>
 
   <!-- TOAST CONTAINER -->

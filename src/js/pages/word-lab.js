@@ -8,18 +8,66 @@ const WordLabPage = {
   editorMode: false,
 
   tasks: [
+    // Document Management
     { id: 1, title: 'Create a new blank document', instruction: 'Open Word and create a new blank document using Ctrl+N.', xp: 5 },
-    { id: 2, title: 'Type a title with Heading 1 style', instruction: 'Type "MOS Word Practice" and apply Heading 1 style from the Home tab.', xp: 5 },
-    { id: 3, title: 'Add 3 paragraphs of text', instruction: 'Type or paste 3 paragraphs of sample text. You can use =lorem() to generate placeholder text.', xp: 5 },
-    { id: 4, title: 'Apply Bold and Italic formatting', instruction: 'Select a word and make it Bold (Ctrl+B). Select another and make it Italic (Ctrl+I).', xp: 5 },
-    { id: 5, title: 'Insert a table', instruction: 'Go to Insert → Table and create a 3x4 table. Fill some cells with data.', xp: 10 },
-    { id: 6, title: 'Apply a table style', instruction: 'Click the table, go to Table Design tab, and apply a built-in table style.', xp: 5 },
-    { id: 7, title: 'Change page margins', instruction: 'Go to Layout → Margins and select "Narrow" margins.', xp: 5 },
-    { id: 8, title: 'Insert a header with page numbers', instruction: 'Go to Insert → Header → Blank. Then insert page numbers.', xp: 10 },
-    { id: 9, title: 'Add a footer with your name', instruction: 'Go to Insert → Footer → Blank. Type your name in the footer.', xp: 5 },
-    { id: 10, title: 'Insert a picture and wrap text', instruction: 'Insert any image and set text wrapping to "Square" from Picture Format.', xp: 10 },
-    { id: 11, title: 'Create a bulleted list', instruction: 'Type 5 items and apply bullet formatting from the Home tab.', xp: 5 },
-    { id: 12, title: 'Save as PDF', instruction: 'Go to File → Save As and save the document as a PDF file.', xp: 10 }
+    { id: 2, title: 'Save a document as .docx', instruction: 'Go to File → Save As and save as a Word Document (.docx).', xp: 5 },
+    { id: 3, title: 'Save as PDF', instruction: 'Go to File → Save As → PDF and export the document.', xp: 10 },
+    { id: 4, title: 'Open an existing document', instruction: 'Go to File → Open → Browse and open any .docx file.', xp: 5 },
+    { id: 5, title: 'Use Document Properties', instruction: 'Go to File → Info → Properties and add Title, Author, and Subject.', xp: 8 },
+    // Text Formatting
+    { id: 6, title: 'Apply Bold, Italic, and Underline', instruction: 'Select text and apply Bold (Ctrl+B), Italic (Ctrl+I), and Underline (Ctrl+U).', xp: 5 },
+    { id: 7, title: 'Change font and font size', instruction: 'Select text, change font to "Times New Roman" size 14 from the Home tab.', xp: 5 },
+    { id: 8, title: 'Apply text highlight color', instruction: 'Select a sentence, click the Highlight button (Home tab) and choose yellow.', xp: 5 },
+    { id: 9, title: 'Change font color', instruction: 'Select a word, click Font Color dropdown, and choose Red.', xp: 5 },
+    { id: 10, title: 'Apply Strikethrough', instruction: 'Select text and click Strikethrough (abc̶) in the Font group.', xp: 5 },
+    { id: 11, title: 'Use Format Painter', instruction: 'Format text with bold+red. Double-click Format Painter, apply to 3 other words.', xp: 10 },
+    { id: 12, title: 'Apply Subscript and Superscript', instruction: 'Type "H2O" and make the 2 subscript. Type "x2" and make the 2 superscript.', xp: 8 },
+    // Heading & Styles
+    { id: 13, title: 'Apply Heading 1 style', instruction: 'Type a title and apply "Heading 1" from the Styles gallery in Home tab.', xp: 5 },
+    { id: 14, title: 'Apply Heading 2 and Heading 3', instruction: 'Create sub-sections with Heading 2 and sub-sub-sections with Heading 3.', xp: 8 },
+    { id: 15, title: 'Modify a style', instruction: 'Right-click a Style → Modify. Change font to Arial 16pt Blue.', xp: 10 },
+    // Paragraphs
+    { id: 16, title: 'Set line spacing to 1.5', instruction: 'Select all text (Ctrl+A). Go to Home → Line Spacing → 1.5.', xp: 5 },
+    { id: 17, title: 'Add paragraph spacing', instruction: 'Go to Layout → Spacing. Set Before: 12pt, After: 6pt.', xp: 8 },
+    { id: 18, title: 'Create a first-line indent', instruction: 'Go to Layout → Indent → Special → First line, 0.5".', xp: 8 },
+    { id: 19, title: 'Set paragraph alignment', instruction: 'Select paragraphs and use Center, Right, and Justify alignment from Home tab.', xp: 5 },
+    // Lists
+    { id: 20, title: 'Create a bulleted list', instruction: 'Type 5 items and apply bullet formatting from the Home tab.', xp: 5 },
+    { id: 21, title: 'Create a numbered list', instruction: 'Type 5 items and apply numbering. Try different numbering styles.', xp: 5 },
+    { id: 22, title: 'Create a multilevel list', instruction: 'Use Tab to indent items into sub-levels within a numbered list.', xp: 10 },
+    // Tables
+    { id: 23, title: 'Insert a table', instruction: 'Go to Insert → Table and create a 4x5 table. Fill cells with data.', xp: 10 },
+    { id: 24, title: 'Apply a table style', instruction: 'Click the table → Table Design → choose a built-in style.', xp: 5 },
+    { id: 25, title: 'Merge and split cells', instruction: 'Select 2 cells → Layout → Merge Cells. Then split another cell into 2 columns.', xp: 10 },
+    { id: 26, title: 'Sort table data', instruction: 'Click inside a table → Layout → Sort. Sort by the first column ascending.', xp: 8 },
+    // Headers, Footers & Page Numbers
+    { id: 27, title: 'Insert a header with page numbers', instruction: 'Go to Insert → Header → Blank. Then Insert → Page Number.', xp: 10 },
+    { id: 28, title: 'Add a footer with your name', instruction: 'Go to Insert → Footer → Blank. Type your name in the footer.', xp: 5 },
+    { id: 29, title: 'Different first page header', instruction: 'Double-click header → check "Different First Page" in Header & Footer Tools.', xp: 10 },
+    // Page Layout
+    { id: 30, title: 'Change page margins to Narrow', instruction: 'Go to Layout → Margins → Narrow.', xp: 5 },
+    { id: 31, title: 'Change page orientation to Landscape', instruction: 'Go to Layout → Orientation → Landscape.', xp: 5 },
+    { id: 32, title: 'Insert a page break', instruction: 'Place cursor where you want the break. Insert → Page Break (or Ctrl+Enter).', xp: 5 },
+    { id: 33, title: 'Add a watermark', instruction: 'Go to Design → Watermark → choose "DRAFT" or create a custom one.', xp: 8 },
+    { id: 34, title: 'Set custom page size', instruction: 'Go to Layout → Size → More Paper Sizes. Set custom width and height.', xp: 8 },
+    // Images & Objects
+    { id: 35, title: 'Insert a picture and wrap text', instruction: 'Insert any image. Set text wrapping to "Square" from Picture Format → Wrap Text.', xp: 10 },
+    { id: 36, title: 'Insert a text box', instruction: 'Go to Insert → Text Box → Draw Text Box. Type content inside it.', xp: 8 },
+    { id: 37, title: 'Insert WordArt', instruction: 'Go to Insert → WordArt → choose a style → type your text.', xp: 5 },
+    { id: 38, title: 'Insert a shape', instruction: 'Go to Insert → Shapes → draw a rectangle → add text inside it.', xp: 5 },
+    // References
+    { id: 39, title: 'Insert a Table of Contents', instruction: 'Apply heading styles, then go to References → Table of Contents → Automatic Table 1.', xp: 15 },
+    { id: 40, title: 'Insert a footnote', instruction: 'Place cursor after a word. Go to References → Insert Footnote. Type the note.', xp: 8 },
+    { id: 41, title: 'Insert a citation and bibliography', instruction: 'Go to References → Insert Citation → Add New Source. Then insert Bibliography.', xp: 12 },
+    { id: 42, title: 'Insert a bookmark and cross-reference', instruction: 'Select text → Insert → Bookmark → name it. Then Insert → Cross-reference.', xp: 12 },
+    // Proofing & Review
+    { id: 43, title: 'Run Spelling & Grammar check', instruction: 'Go to Review → Spelling & Grammar. Fix or ignore all suggestions.', xp: 5 },
+    { id: 44, title: 'Use Find and Replace', instruction: 'Press Ctrl+H. Find a word and replace it with another word throughout the document.', xp: 8 },
+    { id: 45, title: 'Add a comment', instruction: 'Select text → Review → New Comment. Type a review note.', xp: 5 },
+    // Advanced
+    { id: 46, title: 'Insert columns', instruction: 'Select text → Layout → Columns → Two. Observe text flow into 2 columns.', xp: 10 },
+    { id: 47, title: 'Insert a hyperlink', instruction: 'Select text → Insert → Link → type a URL. Test by Ctrl+clicking it.', xp: 5 },
+    { id: 48, title: 'Protect the document', instruction: 'Go to File → Info → Protect Document → Mark as Final.', xp: 8 },
   ],
 
   init() {
