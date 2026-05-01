@@ -740,149 +740,129 @@ const GamesPage = {
   _whotPlayCard(index) {
     const s = this.whotState;
     if (!s || s.turn !== 'player' || s.gameOver) return;
-
     const card = s.playerHand[index];
 
     // Special cards
     if (card.special) {
       s.playerHand.splice(index, 1);
       this._applySpecial(card.special, 'player');
-      this._advanceTurn();
+      if (this._checkGameOver()) return;
+      // After special: give turn to CPU
+      s.turn = 'cpu';
+      this._renderWhot();
+      setTimeout(() => this._cpuPlay(), 1500);
       return;
     }
 
     // Answer card
+    s.playerHand.splice(index, 1);
     if (card.isCorrect) {
       s.playerScore++;
-      s.playerHand.splice(index, 1);
-      s.message = '✅ Correct! +1 point. CPU\'s turn...';
-      if (window.Toast) Toast.success('✅ Correct answer!');
-      s.currentQ++;
-      s.round++;
+      s.message = '✅ Correct! +1 point. Waiting for CPU...';
+      if (window.Toast) Toast.success('✅ Correct!');
     } else {
-      s.playerHand.splice(index, 1);
-      s.message = '❌ Wrong answer! No points. CPU\'s turn...';
-      if (window.Toast) Toast.error('❌ Wrong! That wasn\'t the right answer.');
+      s.message = '❌ Wrong card! No points. Waiting for CPU...';
+      if (window.Toast) Toast.error('❌ Wrong answer.');
     }
+    s.currentQ++;
+    s.round++;
 
-    this._advanceTurn();
+    if (this._checkGameOver()) return;
+    s.turn = 'cpu';
+    this._renderWhot();
+    setTimeout(() => this._cpuPlay(), 1500);
   },
 
   _whotDraw() {
     const s = this.whotState;
     if (!s || s.turn !== 'player' || s.gameOver) return;
-
-    if (s.drawPile.length === 0) {
-      if (window.Toast) Toast.warning('No cards left to draw!');
-      return;
-    }
-
+    if (s.drawPile.length === 0) { if (window.Toast) Toast.warning('No cards left!'); return; }
     s.playerHand.push(s.drawPile.pop());
-    s.message = 'Drew a card. CPU\'s turn...';
-    this._advanceTurn();
+    s.message = 'You drew a card. Waiting for CPU...';
+    if (this._checkGameOver()) return;
+    s.turn = 'cpu';
+    this._renderWhot();
+    setTimeout(() => this._cpuPlay(), 1500);
   },
 
-  _advanceTurn() {
+  _checkGameOver() {
     const s = this.whotState;
-
-    // Check game over
-    if (s.playerHand.length === 0 || s.cpuHand.length === 0 || s.round > 15) {
+    if (s.playerHand.length === 0 || s.cpuHand.length === 0 || s.round > 15 || (s.drawPile.length === 0 && s.round > 5)) {
       s.gameOver = true;
       s.message = 'Game Over!';
       const xp = Math.max(10, s.playerScore * 10);
       if (s.playerScore > s.cpuScore) {
-        XP.award(xp, 'Won MOS WHOT!');
-        Confetti.burst();
+        if (window.XP) XP.award(xp, 'Won MOS WHOT!');
+        if (window.Confetti) Confetti.burst();
       } else {
-        XP.award(Math.floor(xp / 2), 'Played MOS WHOT');
+        if (window.XP) XP.award(Math.floor(xp / 2), 'Played MOS WHOT');
       }
-      Storage.addActivity({ type: 'game', text: `MOS WHOT: You ${s.playerScore} - CPU ${s.cpuScore}` });
+      if (window.Storage) Storage.addActivity({ type: 'game', text: 'MOS WHOT: You ' + s.playerScore + ' - CPU ' + s.cpuScore });
       this._renderWhot();
-      return;
+      return true;
     }
-
-    if (s.turn === 'player') {
-      s.turn = 'cpu';
-      this._renderWhot();
-      // CPU plays after delay
-      setTimeout(() => this._cpuPlay(), 1200);
-    } else {
-      s.turn = 'player';
-      s.message = 'Your turn! Play a card with the correct answer.';
-      this._renderWhot();
-    }
+    return false;
   },
 
   _cpuPlay() {
     const s = this.whotState;
-    if (!s || s.gameOver) return;
+    if (!s || s.gameOver || s.turn !== 'cpu') return;
 
-    const q = s.questions[s.currentQ % s.questions.length];
+    const qIdx = s.currentQ % s.questions.length;
 
-    // CPU tries to find the correct answer card (70% chance of playing correctly)
-    const correctCard = s.cpuHand.findIndex(c => c.isCorrect && c.questionIdx === s.currentQ % s.questions.length);
-    const specialCard = s.cpuHand.findIndex(c => c.special);
-    const isClever = Math.random() < 0.7;
+    // CPU tries to find correct answer (60% success rate)
+    const correctIdx = s.cpuHand.findIndex(c => c.isCorrect && c.questionIdx === qIdx);
+    const specialIdx = s.cpuHand.findIndex(c => c.special);
 
-    if (correctCard >= 0 && isClever) {
-      // CPU plays correct answer
-      s.cpuHand.splice(correctCard, 1);
+    if (correctIdx >= 0 && Math.random() < 0.6) {
+      s.cpuHand.splice(correctIdx, 1);
       s.cpuScore++;
-      s.message = '🤖 CPU played the correct answer! +1 for CPU.';
-      s.currentQ++;
-      s.round++;
-    } else if (specialCard >= 0 && Math.random() < 0.4) {
-      // CPU plays special card
-      const card = s.cpuHand.splice(specialCard, 1)[0];
+      s.message = '🤖 CPU answered correctly! +1 for CPU. Your turn!';
+    } else if (specialIdx >= 0 && Math.random() < 0.35) {
+      const card = s.cpuHand.splice(specialIdx, 1)[0];
       this._applySpecial(card.special, 'cpu');
     } else if (s.cpuHand.length > 0) {
-      // CPU plays random card (likely wrong)
+      // CPU plays a random card
       const idx = Math.floor(Math.random() * s.cpuHand.length);
       const card = s.cpuHand.splice(idx, 1)[0];
-      if (card.special) {
-        this._applySpecial(card.special, 'cpu');
-      } else if (card.isCorrect) {
-        s.cpuScore++;
-        s.message = '🤖 CPU got lucky with a correct answer!';
-        s.currentQ++;
-        s.round++;
-      } else {
-        s.message = '🤖 CPU played a wrong card. No points for CPU.';
-        s.currentQ++;
-        s.round++;
-      }
+      if (card.special) { this._applySpecial(card.special, 'cpu'); }
+      else if (card.isCorrect) { s.cpuScore++; s.message = '🤖 CPU got lucky! +1 for CPU. Your turn!'; }
+      else { s.message = '🤖 CPU played wrong. No points. Your turn!'; }
+    } else if (s.drawPile.length > 0) {
+      s.cpuHand.push(s.drawPile.pop());
+      s.message = '🤖 CPU drew a card. Your turn!';
     } else {
-      // CPU draws
-      if (s.drawPile.length > 0) s.cpuHand.push(s.drawPile.pop());
-      s.message = '🤖 CPU drew a card.';
+      s.message = '🤖 CPU has no moves. Your turn!';
     }
 
+    s.currentQ++;
+    s.round++;
+
+    if (this._checkGameOver()) return;
+    // Give turn back to player
     s.turn = 'player';
-    this._advanceTurn();
+    this._renderWhot();
   },
 
   _applySpecial(type, playedBy) {
     const s = this.whotState;
-    const target = playedBy === 'player' ? 'cpu' : 'player';
-    const targetHand = target === 'player' ? s.playerHand : s.cpuHand;
+    const targetHand = playedBy === 'player' ? s.cpuHand : s.playerHand;
+    const who = playedBy === 'player' ? 'You' : '🤖 CPU';
 
     switch (type) {
       case 'pick2':
         for (let i = 0; i < 2 && s.drawPile.length > 0; i++) targetHand.push(s.drawPile.pop());
-        s.message = `${playedBy === 'player' ? 'You' : '🤖 CPU'} played PICK 2! ${target === 'player' ? 'You pick' : 'CPU picks'} 2 cards.`;
+        s.message = who + ' played PICK 2! Opponent picks 2 cards.';
         break;
       case 'suspend':
-        s.message = `${playedBy === 'player' ? 'You' : '🤖 CPU'} played SUSPENSION! ${target === 'player' ? 'You lose' : 'CPU loses'} a turn.`;
-        // Skip the opponent's next turn by not changing turn
+        s.message = who + ' played SUSPENSION! Opponent loses a turn.';
         break;
       case 'holdon':
-        s.message = `${playedBy === 'player' ? 'You' : '🤖 CPU'} played HOLD ON! Gets another turn.`;
+        s.message = who + ' played HOLD ON! Gets another turn.';
         break;
       case 'market':
-        for (let i = 0; i < 1 && s.drawPile.length > 0; i++) {
-          s.playerHand.push(s.drawPile.pop());
-          if (s.drawPile.length > 0) s.cpuHand.push(s.drawPile.pop());
-        }
+        if (s.drawPile.length > 0) s.playerHand.push(s.drawPile.pop());
+        if (s.drawPile.length > 0) s.cpuHand.push(s.drawPile.pop());
         s.message = 'GENERAL MARKET! Everyone draws a card.';
         break;
     }
@@ -890,3 +870,4 @@ const GamesPage = {
 };
 
 window.GamesPage = GamesPage;
+

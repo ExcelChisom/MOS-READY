@@ -72,6 +72,10 @@
           <span class="nav-tab__icon">🎮</span>
           Games
         </button>
+        <button class="nav-tab" data-page="relax" id="nav-relax">
+          <span class="nav-tab__icon">🌴</span>
+          Relax Games
+        </button>
 
         <div class="sidebar__section-label" style="margin-top:var(--space-md)">Exams</div>
         <button class="nav-tab" data-page="mock-exam" id="nav-mock-exam">
@@ -407,6 +411,22 @@
       </div>
 
       <!-- RESOURCES PAGE -->
+
+      <!-- RELAX GAMES PAGE -->
+      <div class="page" id="page-relax" data-title="Relax Games">
+        <div class="page__header"
+          style="background:linear-gradient(135deg,#0b1120,#264653);padding:var(--space-xl);border-radius:var(--radius-lg);border:1px solid var(--border-subtle);display:flex;align-items:center;gap:var(--space-lg)">
+          <div style="font-size:64px">🎮</div>
+          <div>
+            <h2 class="heading-1" style="color:white;margin:0">Relax & Fun Games</h2>
+            <p style="opacity:0.8;font-size:16px">Take a break from studying! Play Burger Builder or MOS Monopoly.</p>
+          </div>
+        </div>
+        <div id="relax-game-area" style="margin-top:var(--space-lg)">
+          <!-- Populated by RelaxGames.showMenu() -->
+        </div>
+      </div>
+
       <!-- WORD LAB PAGE -->
       <div class="page" id="page-word-lab" data-title="Word Lab">
         <div class="page__header">
@@ -869,16 +889,19 @@
 
   <!-- PLAYLIST PANEL -->
   <div id="playlist-panel" class="glass-card"
-    style="display:none; position:fixed; bottom:80px; right:80px; z-index:10000; width:360px; padding:16px; box-shadow:0 10px 40px rgba(0,0,0,0.5); border:1px solid rgba(0,245,212,0.2)">
+    style="display:none; position:fixed; bottom:80px; right:80px; z-index:10000; width:380px; padding:16px; box-shadow:0 10px 40px rgba(0,0,0,0.5); border:1px solid rgba(0,245,212,0.2)">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
       <h4 style="margin:0;color:var(--accent-cyan)">🎶 External Playlist</h4>
       <button onclick="AppTools.togglePlaylist()" style="background:none;border:none;color:white;cursor:pointer;font-size:18px">✖</button>
     </div>
     <p style="font-size:11px;color:#f72585;margin-bottom:10px;padding:8px;background:rgba(247,37,133,0.1);border-radius:6px;border-left:3px solid #f72585">⚠️ External music may distract from real exam conditions. The built-in Focus Music simulates actual test-center ambiance for better preparation.</p>
     <input type="text" id="playlist-url" placeholder="Paste YouTube, Spotify, or SoundCloud URL..."
-      style="width:100%;padding:10px;border-radius:8px;background:#0b1120;color:white;border:1px solid rgba(255,255,255,0.1);margin-bottom:10px;font-size:13px"
+      style="width:100%;padding:10px;border-radius:8px;background:#0b1120;color:white;border:1px solid rgba(255,255,255,0.1);margin-bottom:8px;font-size:13px"
       onkeydown="if(event.key==='Enter')AppTools.loadPlaylist()">
-    <button class="btn btn-primary w-full" onclick="AppTools.loadPlaylist()" style="margin-bottom:10px">▶️ Load & Play</button>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <button class="btn btn-primary" onclick="AppTools.loadPlaylist()" style="flex:1">▶️ Play URL</button>
+      <button class="btn btn-secondary" onclick="AppTools.loadLocalFile()" style="flex:1">📁 From Device</button>
+    </div>
     <div id="playlist-player"></div>
   </div>
 
@@ -973,7 +996,7 @@
   <script src="/src/js/pages/mock-exam.js"></script>
   <script src="/src/js/pages/practice-exam.js"></script>
   <script src="/src/js/pages/word-lab.js"></script>
+  <script src="/src/js/pages/relax-games.js"></script>
   <script src="/src/js/app.js"></script>
 </body>
-
 </html>

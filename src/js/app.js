@@ -36,6 +36,12 @@ document.addEventListener('keydown', e => {
     // Initialize router (last, so page callbacks are registered)
     Router.init();
 
+    if (window.Router && window.RelaxGames) {
+      Router.onPageEnter('relax', () => {
+        RelaxGames.showMenu();
+      });
+    }
+
     AntiCheat.init();
     BackgroundWorkers.init();
 

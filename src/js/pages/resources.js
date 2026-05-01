@@ -240,41 +240,61 @@ window.Resources = {
   // AI ANALYSIS (questions, explanations, mindmap)
   // ==========================================
   _analyzeText(text, amount) {
-    const sentences = text.split(/[.?!\n]/).filter(s => s.trim().length > 15);
-    const words = text.split(/\s+/);
+    // STEP 1: Clean the text - remove binary junk, normalize whitespace
+    let cleaned = text
+      .replace(/[^\x20-\x7E\n\r\t.,;:!?'"()\-–—\u00C0-\u024F]/g, ' ')  // keep ASCII + accented chars
+      .replace(/\s{3,}/g, '\n')  // collapse excessive whitespace
+      .replace(/(.)\1{4,}/g, '$1')  // remove repeated chars (like "aaaaaa")
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
 
-    // Extract key phrases (capitalized multi-word phrases)
+    // STEP 2: Extract meaningful sentences (min 8 words, must have real words)
+    const rawSentences = cleaned.split(/[.!?\n]+/);
+    const sentences = [];
+    for (const raw of rawSentences) {
+      const s = raw.trim();
+      const wordCount = s.split(/\s+/).filter(w => w.length > 1).length;
+      // Must have at least 5 real words and not be mostly numbers/symbols
+      const letterRatio = (s.replace(/[^a-zA-Z]/g, '').length) / Math.max(s.length, 1);
+      if (wordCount >= 5 && s.length > 20 && s.length < 400 && letterRatio > 0.5) {
+        sentences.push(s);
+      }
+    }
+
+    if (sentences.length === 0) {
+      if (window.Toast) Toast.error('Could not extract readable text from this file. Try a .txt or .md file with clear text content.');
+      return;
+    }
+
+    // STEP 3: Extract key concepts (multi-word phrases and frequent terms)
     const keyPhrases = [];
-    const phraseRegex = /[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*/g;
+    const phraseRegex = /[A-Z][a-z]{2,}(?:\s+[A-Z][a-z]{2,})*/g;
     let pm;
-    while ((pm = phraseRegex.exec(text)) !== null) {
+    while ((pm = phraseRegex.exec(cleaned)) !== null) {
       if (pm[0].length > 4 && !keyPhrases.includes(pm[0])) keyPhrases.push(pm[0]);
     }
 
-    // Also extract common concepts from the text
-    const conceptWords = words.filter(w => w.length > 5).map(w => w.replace(/[^a-zA-Z]/g, '')).filter(w => w.length > 5);
+    const words = cleaned.split(/\s+/).map(w => w.replace(/[^a-zA-Z]/g, '').toLowerCase()).filter(w => w.length > 4);
     const wordFreq = {};
-    conceptWords.forEach(w => { const lw = w.toLowerCase(); wordFreq[lw] = (wordFreq[lw] || 0) + 1; });
-    const topConcepts = Object.entries(wordFreq).sort((a, b) => b[1] - a[1]).slice(0, 15).map(e => e[0]);
+    words.forEach(w => { wordFreq[w] = (wordFreq[w] || 0) + 1; });
+    const topConcepts = Object.entries(wordFreq)
+      .filter(e => e[1] >= 2)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 15)
+      .map(e => e[0]);
 
     // ---- EXPLANATION BREAKDOWN ----
     let explHTML = '<div style="display:flex;flex-direction:column;gap:16px">';
-    const chunks = [];
-    for (let i = 0; i < sentences.length && chunks.length < 8; i++) {
-      const s = sentences[i].trim();
-      if (s.length > 20 && s.length < 300) chunks.push(s);
-    }
-
-    if (chunks.length > 0) {
-      explHTML += '<p style="color:var(--accent-cyan);font-weight:700;font-size:15px">📖 Your document broken down into digestible chunks:</p>';
-      chunks.forEach((chunk, i) => {
+    const explChunks = sentences.slice(0, 8);
+    if (explChunks.length > 0) {
+      explHTML += '<p style="color:var(--accent-cyan);font-weight:700;font-size:15px">📖 Your document broken down:</p>';
+      explChunks.forEach((chunk, i) => {
         explHTML += '<div style="background:rgba(124,92,252,0.08);border-left:3px solid var(--accent-purple);padding:14px 18px;border-radius:0 10px 10px 0">';
-        explHTML += '<p style="font-weight:600;color:var(--accent-yellow);margin-bottom:6px;font-size:13px">Chunk ' + (i + 1) + '</p>';
+        explHTML += '<p style="font-weight:600;color:var(--accent-yellow);margin-bottom:6px;font-size:13px">Section ' + (i + 1) + '</p>';
         explHTML += '<p style="line-height:1.7;font-size:14px">' + this._esc(chunk) + '</p>';
         explHTML += '</div>';
       });
     }
-
     if (topConcepts.length > 0) {
       explHTML += '<div style="margin-top:8px"><p style="font-weight:700;margin-bottom:10px">🔑 Key Concepts Found:</p>';
       explHTML += '<div style="display:flex;flex-wrap:wrap;gap:8px">';
@@ -285,63 +305,75 @@ window.Resources = {
     }
     explHTML += '</div>';
 
-    // ---- GENERATE REAL QUIZ QUESTIONS ----
+    // ---- GENERATE COMPREHENSION QUESTIONS ----
     let questHTML = '';
-    const qCount = Math.min(amount, Math.max(sentences.length, 3));
-    for (let i = 0; i < qCount; i++) {
-      const source = sentences[i % sentences.length] || 'This document discusses important concepts.';
-      const cleanSource = source.trim();
+    const qCount = Math.min(amount, sentences.length);
+    const usedSentences = sentences.sort(() => Math.random() - 0.5).slice(0, qCount);
 
-      // Generate a fill-in-the-blank or comprehension question
-      const sourceWords = cleanSource.split(/\s+/);
+    for (let i = 0; i < usedSentences.length; i++) {
+      const srcSentence = usedSentences[i];
+      const srcWords = srcSentence.split(/\s+/).filter(w => w.replace(/[^a-zA-Z]/g, '').length > 3);
+
       let questionText, options, correctIdx;
 
-      if (sourceWords.length > 6) {
-        // Pick a key word to blank out
-        const candidates = sourceWords.filter(w => w.length > 4 && w.replace(/[^a-zA-Z]/g, '').length > 3);
-        if (candidates.length > 0) {
-          const blankWord = candidates[Math.floor(Math.random() * candidates.length)];
-          const cleanBlank = blankWord.replace(/[^a-zA-Z]/g, '');
-          questionText = 'Fill in the blank: "' + cleanSource.replace(blankWord, '_____') + '"';
+      // Pick a meaningful word to blank out
+      const candidates = srcWords.filter(w => {
+        const clean = w.replace(/[^a-zA-Z]/g, '');
+        return clean.length > 3 && !['that', 'this', 'with', 'from', 'have', 'been', 'were', 'will', 'they', 'their', 'which', 'about', 'would', 'could', 'should', 'there', 'these', 'those'].includes(clean.toLowerCase());
+      });
 
-          // Generate distractors from other words in the text
-          const distractors = topConcepts.filter(w => w !== cleanBlank.toLowerCase()).slice(0, 3);
-          while (distractors.length < 3) distractors.push(['process', 'system', 'method', 'feature', 'option'][distractors.length]);
-          correctIdx = Math.floor(Math.random() * 4);
-          options = [...distractors];
-          options.splice(correctIdx, 0, cleanBlank);
-          options = options.slice(0, 4);
-        } else {
-          questionText = 'Which of the following best summarizes this statement?';
-          options = [cleanSource.substring(0, 60), 'None of the above', 'All of the below', 'Cannot be determined'];
-          correctIdx = 0;
+      if (candidates.length > 0) {
+        const target = candidates[Math.floor(Math.random() * candidates.length)];
+        const cleanTarget = target.replace(/[^a-zA-Z]/g, '');
+
+        // Build readable question
+        const blanked = srcSentence.replace(target, '________');
+        questionText = 'Complete the sentence: "' + blanked + '"';
+
+        // Build distractors from other words in the document (same length range)
+        const distractorPool = topConcepts.filter(w => w !== cleanTarget.toLowerCase() && Math.abs(w.length - cleanTarget.length) < 4);
+        while (distractorPool.length < 3) {
+          const extraWords = words.filter(w => w !== cleanTarget.toLowerCase() && w.length > 3 && !distractorPool.includes(w));
+          if (extraWords.length > 0) distractorPool.push(extraWords[Math.floor(Math.random() * extraWords.length)]);
+          else { distractorPool.push('alternative'); break; }
         }
+
+        correctIdx = Math.floor(Math.random() * 4);
+        options = distractorPool.slice(0, 3);
+        options.splice(correctIdx, 0, cleanTarget);
+        options = options.slice(0, 4);
       } else {
-        questionText = 'What does the following statement refer to?';
-        options = [cleanSource, 'A different concept entirely', 'This is not relevant', 'Cannot be determined from context'];
+        // Fallback: true/false style
+        questionText = 'Is the following statement from the document?';
+        const shortened = srcSentence.length > 100 ? srcSentence.substring(0, 97) + '...' : srcSentence;
+        options = ['Yes — "' + shortened + '"', 'No, this is unrelated', 'Partially correct', 'Cannot determine'];
         correctIdx = 0;
       }
 
       questHTML += '<div style="background:rgba(255,255,255,0.04);padding:16px;border-radius:10px;margin-bottom:14px;border-left:3px solid var(--accent-yellow)">';
-      questHTML += '<p style="font-weight:700;color:var(--accent-yellow);margin-bottom:8px;font-size:13px">Q' + (i + 1) + ': ' + this._esc(questionText) + '</p>';
+      questHTML += '<p style="font-weight:700;color:var(--accent-yellow);margin-bottom:10px;font-size:13px;line-height:1.6">Q' + (i + 1) + '. ' + this._esc(questionText) + '</p>';
       questHTML += '<div style="display:flex;flex-direction:column;gap:6px">';
       options.forEach((opt, oi) => {
         const letter = String.fromCharCode(65 + oi);
         const isCorrect = oi === correctIdx;
-        questHTML += '<div onclick="this.style.background=\'' + (isCorrect ? 'rgba(0,245,212,0.15)' : 'rgba(247,37,133,0.15)') + '\';this.style.borderColor=\'' + (isCorrect ? '#00f5d4' : '#f72585') + '\'" style="padding:10px 14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;cursor:pointer;transition:all 0.2s;font-size:13px;display:flex;align-items:center;gap:10px">';
-        questHTML += '<span style="background:rgba(124,92,252,0.3);width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0">' + letter + '</span>';
-        questHTML += '<span>' + this._esc(opt) + '</span>';
+        questHTML += '<div onclick="this.style.background=\'' + (isCorrect ? 'rgba(0,245,212,0.15)' : 'rgba(247,37,133,0.15)') + '\';this.style.borderColor=\'' + (isCorrect ? '#00f5d4' : '#f72585') + '\';this.querySelector(\'.qfb\').style.display=\'block\'" style="padding:10px 14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;cursor:pointer;transition:all 0.2s;font-size:13px;display:flex;align-items:center;gap:10px">';
+        questHTML += '<span style="background:rgba(124,92,252,0.3);min-width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0">' + letter + '</span>';
+        questHTML += '<span style="flex:1">' + this._esc(opt) + '</span>';
+        questHTML += '<span class="qfb" style="display:none;font-size:11px;font-weight:600;color:' + (isCorrect ? '#00f5d4' : '#f72585') + '">' + (isCorrect ? '✓ Correct' : '✗ Wrong') + '</span>';
         questHTML += '</div>';
       });
       questHTML += '</div></div>';
     }
 
-    // ---- YouTube references ----
+    // ---- YouTube embeds (inline) ----
     let ytHTML = '';
     const searchTerms = keyPhrases.slice(0, 3);
-    if (searchTerms.length === 0) searchTerms.push('study tips', 'exam preparation');
+    if (searchTerms.length === 0 && topConcepts.length > 0) searchTerms.push(...topConcepts.slice(0, 2));
+    if (searchTerms.length === 0) searchTerms.push('study tips');
     searchTerms.forEach(term => {
-      ytHTML += '<a href="https://www.youtube.com/results?search_query=' + encodeURIComponent(term) + '" target="_blank" rel="noopener" class="btn btn-secondary" style="text-align:left;display:flex;justify-content:space-between;align-items:center"><span>📺 ' + this._esc(term) + '</span><span>↗</span></a>';
+      const query = encodeURIComponent(term + ' tutorial explained');
+      ytHTML += '<div style="margin-bottom:10px"><p style="font-size:12px;opacity:0.6;margin-bottom:6px">📺 ' + this._esc(term) + '</p>';
+      ytHTML += '<iframe src="https://www.youtube.com/embed?listType=search&list=' + query + '" style="width:100%;height:160px;border:none;border-radius:8px" allow="encrypted-media" allowfullscreen></iframe></div>';
     });
 
     // Display results
@@ -359,8 +391,8 @@ window.Resources = {
     const branches = [...keyPhrases.slice(0, 6), ...topConcepts.slice(0, 6)];
     if (branches.length > 2) this._renderMindmap(branches.slice(0, 12), 'Your Content');
 
-    if (window.Storage) Storage.addActivity({ type: 'other', text: 'Analyzed file: generated ' + amount + ' questions' });
-    if (window.Toast) Toast.success('Analysis complete!');
+    if (window.Storage) Storage.addActivity({ type: 'other', text: 'Analyzed file: generated ' + qCount + ' questions' });
+    if (window.Toast) Toast.success('Analysis complete! ' + qCount + ' questions generated.');
   },
 
   // ==========================================
