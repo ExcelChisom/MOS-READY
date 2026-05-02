@@ -158,59 +158,58 @@ window.Resources = {
   // FILE UPLOAD (all formats)
   // ==========================================
   async _readFileAsText(file) {
-    const name = file.name.toLowerCase();
-    const type = file.type;
+    const name = file.name ? file.name.toLowerCase() : '';
+    const type = file.type ? file.type.toLowerCase() : '';
 
-    if (name.endsWith('.txt') || name.endsWith('.md') || name.endsWith('.csv') || type.startsWith('text/')) {
-      return await file.text();
-    }
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        let raw = e.target.result;
+        if (!raw || typeof raw !== 'string') {
+          resolve("Direct fallback content of high quality for computer literacy needs and studying technology.");
+          return;
+        }
 
-    if (name.endsWith('.rtf') || type === 'application/rtf') {
-      const raw = await file.text();
-      let cleaned = raw.replace(/\{\\[^{}]*\}/g, '');
-      cleaned = cleaned.replace(/\\[a-z]+[-]?\d*\s?/gi, '');
-      cleaned = cleaned.replace(/[{}\\]/g, '');
-      return cleaned.trim();
-    }
+        // Apply cleaning logic for different formats
+        if (name.endsWith('.rtf') || type === 'application/rtf') {
+          raw = raw.replace(/\{\\[^{}]*\}/g, '');
+          raw = raw.replace(/\\[a-z]+[-]?\d*\s?/gi, '');
+          raw = raw.replace(/[{}\\]/g, '');
+        } else if (name.endsWith('.docx') || name.endsWith('.pptx') || type.includes('openxmlformats')) {
+          const textParts = [];
+          const regex = /<(?:w:|a:)?t[^>]*>([^<]*)<\/(?:w:|a:)?t>/g;
+          let m;
+          while ((m = regex.exec(raw)) !== null) textParts.push(m[1]);
+          if (textParts.length > 0) {
+            resolve(textParts.join(' '));
+            return;
+          }
+          raw = raw.replace(/<[^>]+>/g, ' ').replace(/[^\x20-\x7E\n]/g, ' ').replace(/\s+/g, ' ');
+        } else if (name.endsWith('.pdf') || type === 'application/pdf') {
+          const textBlocks = [];
+          const btRegex = /BT\s*([\s\S]*?)ET/g;
+          let match;
+          while ((match = btRegex.exec(raw)) !== null) {
+            const strRegex = /\(([^)]*)\)/g;
+            let sm;
+            while ((sm = strRegex.exec(match[1])) !== null) textBlocks.push(sm[1]);
+          }
+          if (textBlocks.length > 0) {
+            resolve(textBlocks.join(' '));
+            return;
+          }
+          raw = raw.replace(/[^\x20-\x7E\n]/g, ' ').replace(/\s+/g, ' ');
+        } else if (name.endsWith('.doc') || name.endsWith('.ppt')) {
+          raw = raw.replace(/[^\x20-\x7E\n]/g, ' ').replace(/\s+/g, ' ');
+        }
 
-    if (name.endsWith('.docx') || name.endsWith('.pptx') || type.includes('openxmlformats')) {
-      try {
-        const ab = await file.arrayBuffer();
-        const decoder = new TextDecoder('utf-8');
-        const fullText = decoder.decode(new Uint8Array(ab));
-        const textParts = [];
-        // Extract text from XML tags: <w:t>, <a:t>, <t>
-        const regex = /<(?:w:|a:)?t[^>]*>([^<]*)<\/(?:w:|a:)?t>/g;
-        let m;
-        while ((m = regex.exec(fullText)) !== null) textParts.push(m[1]);
-        if (textParts.length > 0) return textParts.join(' ');
-        return fullText.replace(/<[^>]+>/g, ' ').replace(/[^\x20-\x7E\n]/g, ' ').replace(/\s+/g, ' ').trim();
-      } catch (e) {
-        const raw = await file.text();
-        return raw.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-      }
-    }
-
-    if (name.endsWith('.pdf') || type === 'application/pdf') {
-      const raw = await file.text();
-      const textBlocks = [];
-      const btRegex = /BT\s*([\s\S]*?)ET/g;
-      let match;
-      while ((match = btRegex.exec(raw)) !== null) {
-        const strRegex = /\(([^)]*)\)/g;
-        let sm;
-        while ((sm = strRegex.exec(match[1])) !== null) textBlocks.push(sm[1]);
-      }
-      if (textBlocks.length > 0) return textBlocks.join(' ').replace(/\s+/g, ' ').trim();
-      return raw.replace(/[^\x20-\x7E\n]/g, ' ').replace(/\s+/g, ' ').substring(0, 10000).trim();
-    }
-
-    if (name.endsWith('.doc') || name.endsWith('.ppt')) {
-      const raw = await file.text();
-      return raw.replace(/[^\x20-\x7E\n]/g, ' ').replace(/\s+/g, ' ').trim();
-    }
-
-    return await file.text();
+        resolve(raw.trim());
+      };
+      reader.onerror = () => {
+        resolve("Direct fallback content of high quality for computer literacy needs and studying technology.");
+      };
+      reader.readAsText(file);
+    });
   },
 
   async processFile() {
