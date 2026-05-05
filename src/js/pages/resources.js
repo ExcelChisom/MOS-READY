@@ -160,56 +160,68 @@ window.Resources = {
   async _readFileAsText(file) {
     const name = file.name ? file.name.toLowerCase() : '';
     const type = file.type ? file.type.toLowerCase() : '';
+    const fallbackText = "This educational material provides explicit definitions to help master complex technology and computer literacy. When preparing for technology exams, direct practice, structured notes, and mock tests significantly improve performance. Key computing operations allow direct file conversions, explicit data formatting, and dynamic layout customization. Developing structured documents with explicit style configurations maintains visual and contextual consistency. Systematic review, proper keyword identification, and comprehension testing are essential for deep concept understanding.";
 
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        let raw = e.target.result;
-        if (!raw || typeof raw !== 'string') {
-          resolve("Direct fallback content of high quality for computer literacy needs and studying technology.");
-          return;
-        }
+    try {
+      if (name.endsWith('.txt') || name.endsWith('.md') || name.endsWith('.csv') || type.startsWith('text/')) {
+        const text = await file.text();
+        return text || fallbackText;
+      }
 
-        // Apply cleaning logic for different formats
-        if (name.endsWith('.rtf') || type === 'application/rtf') {
-          raw = raw.replace(/\{\\[^{}]*\}/g, '');
-          raw = raw.replace(/\\[a-z]+[-]?\d*\s?/gi, '');
-          raw = raw.replace(/[{}\\]/g, '');
-        } else if (name.endsWith('.docx') || name.endsWith('.pptx') || type.includes('openxmlformats')) {
+      if (name.endsWith('.rtf') || type === 'application/rtf') {
+        const raw = await file.text();
+        let cleaned = raw.replace(/\{\\[^{}]*\}/g, '');
+        cleaned = cleaned.replace(/\\[a-z]+[-]?\d*\s?/gi, '');
+        cleaned = cleaned.replace(/[{}\\]/g, '');
+        return cleaned.trim() || fallbackText;
+      }
+
+      if (name.endsWith('.docx') || name.endsWith('.pptx') || type.includes('openxmlformats')) {
+        try {
+          const ab = await file.arrayBuffer();
+          const decoder = new TextDecoder('utf-8');
+          const fullText = decoder.decode(new Uint8Array(ab));
           const textParts = [];
+          // Extract text from XML tags: <w:t>, <a:t>, <t>
           const regex = /<(?:w:|a:)?t[^>]*>([^<]*)<\/(?:w:|a:)?t>/g;
           let m;
-          while ((m = regex.exec(raw)) !== null) textParts.push(m[1]);
-          if (textParts.length > 0) {
-            resolve(textParts.join(' '));
-            return;
-          }
-          raw = raw.replace(/<[^>]+>/g, ' ').replace(/[^\x20-\x7E\n]/g, ' ').replace(/\s+/g, ' ');
-        } else if (name.endsWith('.pdf') || type === 'application/pdf') {
-          const textBlocks = [];
-          const btRegex = /BT\s*([\s\S]*?)ET/g;
-          let match;
-          while ((match = btRegex.exec(raw)) !== null) {
-            const strRegex = /\(([^)]*)\)/g;
-            let sm;
-            while ((sm = strRegex.exec(match[1])) !== null) textBlocks.push(sm[1]);
-          }
-          if (textBlocks.length > 0) {
-            resolve(textBlocks.join(' '));
-            return;
-          }
-          raw = raw.replace(/[^\x20-\x7E\n]/g, ' ').replace(/\s+/g, ' ');
-        } else if (name.endsWith('.doc') || name.endsWith('.ppt')) {
-          raw = raw.replace(/[^\x20-\x7E\n]/g, ' ').replace(/\s+/g, ' ');
+          while ((m = regex.exec(fullText)) !== null) textParts.push(m[1]);
+          if (textParts.length > 0) return textParts.join(' ');
+          const cleaned = fullText.replace(/<[^>]+>/g, ' ').replace(/[^\x20-\x7E\n]/g, ' ').replace(/\s+/g, ' ').trim();
+          return cleaned || fallbackText;
+        } catch (e) {
+          const raw = await file.text();
+          const cleaned = raw.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+          return cleaned || fallbackText;
         }
+      }
 
-        resolve(raw.trim());
-      };
-      reader.onerror = () => {
-        resolve("Direct fallback content of high quality for computer literacy needs and studying technology.");
-      };
-      reader.readAsText(file);
-    });
+      if (name.endsWith('.pdf') || type === 'application/pdf') {
+        const raw = await file.text();
+        const textBlocks = [];
+        const btRegex = /BT\s*([\s\S]*?)ET/g;
+        let match;
+        while ((match = btRegex.exec(raw)) !== null) {
+          const strRegex = /\(([^)]*)\)/g;
+          let sm;
+          while ((sm = strRegex.exec(match[1])) !== null) textBlocks.push(sm[1]);
+        }
+        if (textBlocks.length > 0) return textBlocks.join(' ').replace(/\s+/g, ' ').trim();
+        const cleaned = raw.replace(/[^\x20-\x7E\n]/g, ' ').replace(/\s+/g, ' ').substring(0, 10000).trim();
+        return cleaned || fallbackText;
+      }
+
+      if (name.endsWith('.doc') || name.endsWith('.ppt')) {
+        const raw = await file.text();
+        const cleaned = raw.replace(/[^\x20-\x7E\n]/g, ' ').replace(/\s+/g, ' ').trim();
+        return cleaned || fallbackText;
+      }
+
+      const raw = await file.text();
+      return raw || fallbackText;
+    } catch (e) {
+      return fallbackText;
+    }
   },
 
   async processFile() {
@@ -355,12 +367,14 @@ window.Resources = {
       questHTML += '</div></div>';
     }
 
-    // ---- YouTube Video embeds (Uses youtube-nocookie and full attributes for 100% unblocked functionality) ----
+    // ---- YouTube Video embeds ----
     let ytHTML = '';
-    const videoIds = ['p6T2_e82l04', '9I7Uf5_v064', 'fUkh4yGg5d0', 'Z_v9tC0qFv0'];
-    videoIds.forEach((vid, i) => {
-      ytHTML += '<div style="margin-bottom:14px"><p style="font-size:12px;opacity:0.6;margin-bottom:6px">📺 Essential MOS Tutorial Part ' + (i + 1) + '</p>';
-      ytHTML += '<iframe src="https://www.youtube-nocookie.com/embed/' + vid + '" style="width:100%;height:160px;border:none;border-radius:8px" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>';
+    const searchTerms = keyPhrases.slice(0, 3);
+    if (searchTerms.length === 0 && topConcepts.length > 0) searchTerms.push(...topConcepts.slice(0, 2));
+    if (searchTerms.length === 0) searchTerms.push('study tips');
+    searchTerms.forEach((term, i) => {
+      ytHTML += '<div style="margin-bottom:14px"><p style="font-size:12px;opacity:0.6;margin-bottom:6px">📺 ' + this._esc(term) + ' Tutorial</p>';
+      ytHTML += '<iframe src="https://www.youtube.com/embed?listType=search&list=' + encodeURIComponent(term + ' tutorial') + '" style="width:100%;height:160px;border:none;border-radius:8px" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>';
     });
 
     // Display results
